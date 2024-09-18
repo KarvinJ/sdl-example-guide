@@ -18,6 +18,8 @@ bool isGamePaused;
 SDL_Texture *pauseTexture = nullptr;
 SDL_Rect pauseBounds;
 
+int gameStatus;
+
 TTF_Font *fontSquare = nullptr;
 
 SDL_Rect ball = {SCREEN_WIDTH / 2 + 50, SCREEN_HEIGHT / 2, 32, 32};
@@ -64,17 +66,36 @@ void handleEvents()
             exit(0);
         }
 
-        // To handle key pressed more precise, I use this method for handling pause the game or jumping.
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE)
         {
             isGamePaused = !isGamePaused;
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP)
+        {
+            gameStatus++;
+        }
+
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN && gameStatus > 0)
+        {
+            gameStatus--;
+        }
+
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_START)
         {
             isGamePaused = !isGamePaused;
             Mix_PlayChannel(-1, actionSound, 0);
+        }
+
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+        {
+            gameStatus++;
+        }
+
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN && gameStatus > 0)
+        {
+            gameStatus--;
         }
     }
 }
@@ -88,7 +109,6 @@ void update(float deltaTime)
 {
     const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
 
-    // keyboard
     if (currentKeyStates[SDL_SCANCODE_W] && playerSprite.textureBounds.y > 0)
     {
         playerSprite.textureBounds.y -= PLAYER_SPEED * deltaTime;
@@ -109,33 +129,36 @@ void update(float deltaTime)
         playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
     }
 
-    // controller
-    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) && playerSprite.textureBounds.y > 0) 
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) && playerSprite.textureBounds.y > 0)
     {
         playerSprite.textureBounds.y -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) && playerSprite.textureBounds.y < SCREEN_HEIGHT - playerSprite.textureBounds.h) 
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) && playerSprite.textureBounds.y < SCREEN_HEIGHT - playerSprite.textureBounds.h)
     {
         playerSprite.textureBounds.y += PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) && playerSprite.textureBounds.x > 0) 
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) && playerSprite.textureBounds.x > 0)
     {
         playerSprite.textureBounds.x -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w) 
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w)
     {
         playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
     }
-
 
     if (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w)
     {
         ballVelocityX *= -1;
 
         colorIndex = rand_range(0, 5);
+
+        if (gameStatus > 1)
+        {
+            Mix_PlayChannel(-1, actionSound, 0);
+        }
     }
 
     else if (ball.y < 0 || ball.y > SCREEN_HEIGHT - ball.h)
@@ -143,6 +166,11 @@ void update(float deltaTime)
         ballVelocityY *= -1;
 
         colorIndex = rand_range(0, 5);
+
+        if (gameStatus > 1)
+        {
+            Mix_PlayChannel(-1, actionSound, 0);
+        }
     }
 
     else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball))
@@ -151,6 +179,11 @@ void update(float deltaTime)
         ballVelocityY *= -1;
 
         colorIndex = rand_range(0, 5);
+
+        if (gameStatus > 1)
+        {
+            Mix_PlayChannel(-1, actionSound, 0);
+        }
     }
 
     ball.x += ballVelocityX * deltaTime;
@@ -167,16 +200,29 @@ void render()
     SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
     SDL_RenderClear(renderer);
 
-    if (isGamePaused)
+    SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+
+    if (gameStatus < 3)
     {
-        SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
+        SDL_RenderFillRect(renderer, &playerSprite.textureBounds);
     }
 
     SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
 
-    SDL_RenderFillRect(renderer, &ball);
+    if (gameStatus > 0)
+    {
+        SDL_RenderFillRect(renderer, &ball);
+    }
 
-    renderSprite(playerSprite);
+    if (gameStatus > 2)
+    {
+        renderSprite(playerSprite);
+    }
+
+    if (isGamePaused)
+    {
+        SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
+    }
 
     SDL_RenderPresent(renderer);
 }
@@ -207,33 +253,25 @@ int main(int argc, char *args[])
         }
     }
 
-    // load font
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 36);
 
-    // load title
     updateTextureText(pauseTexture, "Game Paused", fontSquare, renderer);
 
     SDL_QueryTexture(pauseTexture, NULL, NULL, &pauseBounds.w, &pauseBounds.h);
     pauseBounds.x = SCREEN_WIDTH / 2 - pauseBounds.w / 2;
     pauseBounds.y = 100;
-    // After I use the &pauseBounds.w, &pauseBounds.h in the SDL_QueryTexture.
-    //  I get the width and height of the actual texture
 
     playerSprite = loadSprite(renderer, "res/sprites/alien_1.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     actionSound = loadSound("res/sounds/magic.wav");
 
-    // method to reduce the volume of the sound in half.
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 2);
 
-    // Load music file (only one data piece, intended for streaming)
     music = loadMusic("res/music/music.wav");
 
-    // reduce music volume in half
     Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
 
-    // Start playing streamed music, put -1 to loop indifinitely
-    Mix_PlayMusic(music, -1);
+    // Mix_PlayMusic(music, -1);
 
     Uint32 previousFrameTime = SDL_GetTicks();
     Uint32 currentFrameTime = previousFrameTime;
