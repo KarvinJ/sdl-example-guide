@@ -18,6 +18,11 @@ bool isGamePaused;
 SDL_Texture *pauseTexture = nullptr;
 SDL_Rect pauseBounds;
 
+SDL_Texture *scoreTexture = nullptr;
+SDL_Rect scoreBounds;
+
+int score;
+
 int gameStatus;
 
 TTF_Font *fontSquare = nullptr;
@@ -72,12 +77,12 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_UP)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS)
         {
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_DOWN && gameStatus > 0)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > 0)
         {
             gameStatus--;
         }
@@ -88,12 +93,12 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_UP)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)
         {
             gameStatus++;
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_DPAD_DOWN && gameStatus > 0)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > 0)
         {
             gameStatus--;
         }
@@ -108,6 +113,32 @@ int rand_range(int min, int max)
 void update(float deltaTime)
 {
     const Uint8 *currentKeyStates = SDL_GetKeyboardState(NULL);
+
+    if (currentKeyStates[SDL_SCANCODE_R])
+    {
+        playerSprite.textureBounds.w = 38;
+        playerSprite.textureBounds.h = 34;
+    }
+
+    if (currentKeyStates[SDL_SCANCODE_LEFT])
+    {
+        playerSprite.textureBounds.w--;
+    }
+
+    else if (currentKeyStates[SDL_SCANCODE_RIGHT])
+    {
+        playerSprite.textureBounds.w++;
+    }
+
+    if (currentKeyStates[SDL_SCANCODE_UP])
+    {
+        playerSprite.textureBounds.h--;
+    }
+
+    else if (currentKeyStates[SDL_SCANCODE_DOWN])
+    {
+        playerSprite.textureBounds.h++;
+    }
 
     if (currentKeyStates[SDL_SCANCODE_W] && playerSprite.textureBounds.y > 0)
     {
@@ -127,6 +158,32 @@ void update(float deltaTime)
     else if (currentKeyStates[SDL_SCANCODE_D] && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w)
     {
         playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
+    }
+
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK))
+    {
+        playerSprite.textureBounds.w = 38;
+        playerSprite.textureBounds.h = 34;
+    }
+    
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X))
+    {
+        playerSprite.textureBounds.w--;
+    }
+
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B))
+    {
+        playerSprite.textureBounds.w++;
+    }
+
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y))
+    {
+        playerSprite.textureBounds.h--;
+    }
+
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A))
+    {
+        playerSprite.textureBounds.h++;
     }
 
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) && playerSprite.textureBounds.y > 0)
@@ -183,7 +240,13 @@ void update(float deltaTime)
         if (gameStatus > 1)
         {
             Mix_PlayChannel(-1, actionSound, 0);
+
+            score++;
         }
+
+        std::string scoreString = "score: " + std::to_string(score);
+
+        updateTextureText(scoreTexture, scoreString.c_str(), fontSquare, renderer);
     }
 
     ball.x += ballVelocityX * deltaTime;
@@ -202,7 +265,7 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus < 3)
+    if (gameStatus < 4)
     {
         SDL_RenderFillRect(renderer, &playerSprite.textureBounds);
     }
@@ -214,7 +277,7 @@ void render()
         SDL_RenderFillRect(renderer, &ball);
     }
 
-    if (gameStatus > 2)
+    if (gameStatus > 3)
     {
         renderSprite(playerSprite);
     }
@@ -222,6 +285,14 @@ void render()
     if (isGamePaused)
     {
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
+    }
+
+    if (gameStatus > 2)
+    {
+        SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
+        scoreBounds.x = 400;
+        scoreBounds.y = scoreBounds.h / 2 - 10;
+        SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
 
     SDL_RenderPresent(renderer);
@@ -254,6 +325,8 @@ int main(int argc, char *args[])
     }
 
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 36);
+
+    updateTextureText(scoreTexture, "Score: 0", fontSquare, renderer);
 
     updateTextureText(pauseTexture, "Game Paused", fontSquare, renderer);
 
