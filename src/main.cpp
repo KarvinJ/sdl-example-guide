@@ -116,6 +116,8 @@ void update(float deltaTime)
 
     if (currentKeyStates[SDL_SCANCODE_R])
     {
+        score = 0;
+
         playerSprite.textureBounds.w = 38;
         playerSprite.textureBounds.h = 34;
     }
@@ -162,6 +164,8 @@ void update(float deltaTime)
 
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK))
     {
+        score = 0;
+        
         playerSprite.textureBounds.w = 38;
         playerSprite.textureBounds.h = 34;
     }
