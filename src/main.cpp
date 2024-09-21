@@ -14,6 +14,7 @@ Sprite playerSprite;
 const int PLAYER_SPEED = 600;
 
 bool isGamePaused;
+bool shouldClearScreen;
 
 SDL_Texture *pauseTexture = nullptr;
 SDL_Rect pauseBounds;
@@ -73,6 +74,11 @@ void handleEvents()
 
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_SPACE)
         {
+            shouldClearScreen = !shouldClearScreen;
+        }
+
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_RETURN)
+        {
             isGamePaused = !isGamePaused;
             Mix_PlayChannel(-1, actionSound, 0);
         }
@@ -85,6 +91,11 @@ void handleEvents()
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > 0)
         {
             gameStatus--;
+        }
+
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSTICK)
+        {
+            shouldClearScreen = !shouldClearScreen;
         }
 
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_START)
@@ -165,11 +176,11 @@ void update(float deltaTime)
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK))
     {
         score = 0;
-        
+
         playerSprite.textureBounds.w = 38;
         playerSprite.textureBounds.h = 34;
     }
-    
+
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X))
     {
         playerSprite.textureBounds.w--;
@@ -264,8 +275,11 @@ void renderSprite(Sprite sprite)
 
 void render()
 {
-    SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-    SDL_RenderClear(renderer);
+    if (shouldClearScreen)
+    {
+        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+        SDL_RenderClear(renderer);
+    }
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
