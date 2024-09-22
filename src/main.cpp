@@ -83,7 +83,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 4)
         {
             gameStatus++;
         }
@@ -104,7 +104,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 4)
         {
             gameStatus++;
         }
@@ -226,11 +226,6 @@ void update(float deltaTime)
         ballVelocityX *= -1;
 
         colorIndex = rand_range(0, 5);
-
-        if (gameStatus > 1)
-        {
-            Mix_PlayChannel(-1, actionSound, 0);
-        }
     }
 
     else if (ball.y < 0 || ball.y > SCREEN_HEIGHT - ball.h)
@@ -238,11 +233,6 @@ void update(float deltaTime)
         ballVelocityY *= -1;
 
         colorIndex = rand_range(0, 5);
-
-        if (gameStatus > 1)
-        {
-            Mix_PlayChannel(-1, actionSound, 0);
-        }
     }
 
     else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball))
@@ -308,7 +298,7 @@ void render()
     if (gameStatus > 2)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
-        scoreBounds.x = 400;
+        scoreBounds.x = 500;
         scoreBounds.y = scoreBounds.h / 2 - 10;
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
@@ -356,11 +346,11 @@ int main(int argc, char *args[])
 
     actionSound = loadSound("res/sounds/magic.wav");
 
-    Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 2);
+    Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
 
     music = loadMusic("res/music/music.wav");
 
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 2);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
 
     // Mix_PlayMusic(music, -1);
 
