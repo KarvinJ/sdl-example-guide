@@ -24,7 +24,7 @@ SDL_Rect scoreBounds;
 
 int score;
 
-int gameStatus;
+int gameStatus = -1;
 
 TTF_Font *fontSquare = nullptr;
 
@@ -88,7 +88,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > 0)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -1)
         {
             gameStatus--;
         }
@@ -273,7 +273,7 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus < 4)
+    if (gameStatus > -1 && gameStatus < 4)
     {
         SDL_RenderFillRect(renderer, &playerSprite.textureBounds);
     }
