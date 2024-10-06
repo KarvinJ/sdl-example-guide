@@ -245,13 +245,16 @@ void update(float deltaTime)
         if (gameStatus > 1)
         {
             Mix_PlayChannel(-1, actionSound, 0);
-
-            score++;
         }
 
-        std::string scoreString = "score: " + std::to_string(score);
+        if (gameStatus > 2)
+        {
+            score++;
 
-        updateTextureText(scoreTexture, scoreString.c_str(), fontSquare, renderer);
+            std::string scoreString = "score: " + std::to_string(score);
+
+            updateTextureText(scoreTexture, scoreString.c_str(), fontSquare, renderer);
+        }
     }
 
     ball.x += ballVelocityX * deltaTime;
