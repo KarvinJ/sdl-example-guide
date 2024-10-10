@@ -242,7 +242,7 @@ void update(float deltaTime)
         player2.y = ball.y;
     }
 
-    if (ball.x < 0)
+    if (gameStatus < 0 && ball.x < 0)
     {
         ball.x = SCREEN_WIDTH / 2 - ball.w;
         ball.y = SCREEN_HEIGHT / 2 - ball.h;
@@ -257,22 +257,7 @@ void update(float deltaTime)
         updateTextureText(scoreTexture2, scoreString.c_str(), fontSquare, renderer);
     }
 
-    if (ball.x < 0)
-    {
-        ball.x = SCREEN_WIDTH / 2 - ball.w;
-        ball.y = SCREEN_HEIGHT / 2 - ball.h;
-
-        ballVelocityX *= -1;
-        ballVelocityY *= -1;
-
-        player2Score++;
-
-        std::string scoreString = "Player 2: " + std::to_string(player2Score);
-
-        updateTextureText(scoreTexture2, scoreString.c_str(), fontSquare, renderer);
-    }
-
-    else if (ball.x > SCREEN_WIDTH - ball.w)
+    else if (gameStatus < 0 && ball.x > SCREEN_WIDTH - ball.w)
     {
         ball.x = SCREEN_WIDTH / 2 - ball.w;
         ball.y = SCREEN_HEIGHT / 2 - ball.h;
@@ -301,7 +286,7 @@ void update(float deltaTime)
         colorIndex = rand_range(0, 5);
     }
 
-    else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball) || SDL_HasIntersection(&player2, &ball))
+    else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball) || (gameStatus < 0 && SDL_HasIntersection(&player2, &ball)))
     {
         ballVelocityX *= -1;
         ballVelocityY *= -1;
@@ -357,7 +342,10 @@ void render()
         SDL_RenderFillRect(renderer, &player2);
     }
 
-    SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
+    if (gameStatus > 0)
+    {
+        SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
+    }
 
     if (gameStatus > 0 || gameStatus < -2)
     {
