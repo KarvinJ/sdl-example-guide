@@ -274,9 +274,7 @@ void update(float deltaTime)
 
         player2Score++;
 
-        std::string scoreString = "Player 2: " + std::to_string(player2Score);
-
-        updateTextureText(scoreTexture2, scoreString.c_str(), fontSquare, renderer);
+        updateTextureText(scoreTexture2, std::to_string(player2Score).c_str(), fontSquare, renderer);
     }
 
     else if (gameStatus < 0 && ball.x > SCREEN_WIDTH - ball.w)
@@ -289,9 +287,7 @@ void update(float deltaTime)
 
         player1Score++;
 
-        std::string scoreString = "Player 1: " + std::to_string(player1Score);
-
-        updateTextureText(scoreTexture, scoreString.c_str(), fontSquare, renderer);
+        updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
     }
 
     if (gameStatus > 0 && (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w))
@@ -324,9 +320,7 @@ void update(float deltaTime)
         {
             player1Score++;
 
-            std::string scoreString = "Player 1: " + std::to_string(player1Score);
-
-            updateTextureText(scoreTexture, scoreString.c_str(), fontSquare, renderer);
+            updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
         }
     }
 
@@ -387,7 +381,7 @@ void render()
     if (gameStatus < -4 || gameStatus > 2)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
-        scoreBounds.x = 200;
+        scoreBounds.x = 450;
         scoreBounds.y = scoreBounds.h / 2 - 10;
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
@@ -433,10 +427,10 @@ int main(int argc, char *args[])
         }
     }
 
-    fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 36);
+    fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 48);
 
-    updateTextureText(scoreTexture, "Player 1: 0", fontSquare, renderer);
-    updateTextureText(scoreTexture2, "Player 2: 0", fontSquare, renderer);
+    updateTextureText(scoreTexture, "0", fontSquare, renderer);
+    updateTextureText(scoreTexture2, "0", fontSquare, renderer);
 
     updateTextureText(pauseTexture, "Game Paused", fontSquare, renderer);
 
