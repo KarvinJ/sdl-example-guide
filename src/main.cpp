@@ -99,7 +99,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -4)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -5)
         {
             gameStatus--;
         }
@@ -125,7 +125,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -4)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -5)
         {
             gameStatus--;
         }
@@ -342,6 +342,11 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
+    if (gameStatus == -5)
+    {
+        SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+    }
+
     if (gameStatus != -1 && gameStatus != 4)
     {
         SDL_RenderFillRect(renderer, &playerSprite.textureBounds);
@@ -391,7 +396,6 @@ void render()
 int main(int argc, char *args[])
 {
     window = SDL_CreateWindow("My Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
-
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
     if (startSDL(window, renderer) > 0)
@@ -402,7 +406,6 @@ int main(int argc, char *args[])
     if (SDL_NumJoysticks() < 1)
     {
         printf("No game controllers connected!\n");
-        // return -1;
     }
     else
     {
