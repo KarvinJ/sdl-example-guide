@@ -5,6 +5,7 @@
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 SDL_GameController *controller = nullptr;
+SDL_GameController *controller2 = nullptr;
 
 Mix_Chunk *actionSound = nullptr;
 Mix_Music *music = nullptr;
@@ -14,7 +15,7 @@ Sprite playerSprite;
 const int PLAYER_SPEED = 600;
 
 bool isGamePaused;
-bool isAutoPlayMode = true;
+bool isAutoPlayMode;
 bool shouldClearScreen = true;
 
 SDL_Texture *pauseTexture = nullptr;
@@ -99,11 +100,12 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -5)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -6)
         {
             gameStatus--;
         }
 
+        //All this functionalities are shared between controllers. In a future I may want to have specific button for just one control in specific.
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
         {
             isAutoPlayMode = !isAutoPlayMode;
@@ -125,7 +127,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -5)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -6)
         {
             gameStatus--;
         }
@@ -189,6 +191,16 @@ void update(float deltaTime)
         playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
     }
 
+    if (currentKeyStates[SDL_SCANCODE_I] && player2.y > 0)
+    {
+        player2.y -= PLAYER_SPEED * deltaTime;
+    }
+
+    else if (currentKeyStates[SDL_SCANCODE_K] && player2.y < SCREEN_HEIGHT - player2.h)
+    {
+        player2.y += PLAYER_SPEED * deltaTime;
+    }
+
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_BACK))
     {
         player1Score = 0;
@@ -235,6 +247,16 @@ void update(float deltaTime)
     else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w)
     {
         playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
+    }
+
+    if (SDL_GameControllerGetButton(controller2, SDL_CONTROLLER_BUTTON_DPAD_UP) && player2.y > 0)
+    {
+        player2.y -= PLAYER_SPEED * deltaTime;
+    }
+
+    else if (SDL_GameControllerGetButton(controller2, SDL_CONTROLLER_BUTTON_DPAD_DOWN) && player2.y < SCREEN_HEIGHT - player2.h)
+    {
+        player2.y += PLAYER_SPEED * deltaTime;
     }
 
     if (isAutoPlayMode && ball.y < SCREEN_HEIGHT - player2.h)
@@ -286,14 +308,14 @@ void update(float deltaTime)
         colorIndex = rand_range(0, 5);
     }
 
-    else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball) || (gameStatus < 0 && SDL_HasIntersection(&player2, &ball)))
+    else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball) || (gameStatus < -3 && SDL_HasIntersection(&player2, &ball)))
     {
         ballVelocityX *= -1;
         ballVelocityY *= -1;
 
         colorIndex = rand_range(0, 5);
 
-        if (gameStatus < -2 || gameStatus > 1)
+        if (gameStatus < -3 || gameStatus > 1)
         {
             Mix_PlayChannel(-1, actionSound, 0);
         }
@@ -327,7 +349,7 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus == -5)
+    if (gameStatus == -6)
     {
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     }
@@ -347,7 +369,7 @@ void render()
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
     }
 
-    if (gameStatus > 0 || gameStatus < -2)
+    if (gameStatus > 0 || gameStatus < -3)
     {
         SDL_RenderFillRect(renderer, &ball);
     }
@@ -362,7 +384,7 @@ void render()
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
     }
 
-    if (gameStatus < -3 || gameStatus > 2)
+    if (gameStatus < -4 || gameStatus > 2)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
         scoreBounds.x = 200;
@@ -370,7 +392,7 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
 
-    if (gameStatus < -3)
+    if (gameStatus < -4)
     {
         SDL_QueryTexture(scoreTexture2, NULL, NULL, &scoreBounds2.w, &scoreBounds2.h);
         scoreBounds2.x = 800;
@@ -402,6 +424,12 @@ int main(int argc, char *args[])
         {
             printf("Unable to open game controller! SDL Error: %s\n", SDL_GetError());
             return -1;
+        }
+
+        controller2 = SDL_GameControllerOpen(1);
+        if (controller2 == NULL)
+        {
+            printf("Unable to open game controller! SDL Error: %s\n", SDL_GetError());
         }
     }
 
