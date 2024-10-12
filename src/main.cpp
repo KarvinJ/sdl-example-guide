@@ -100,12 +100,12 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -6)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -7)
         {
             gameStatus--;
         }
 
-        //All this functionalities are shared between controllers. In a future I may want to have specific button for just one control in specific.
+        // All this functionalities are shared between controllers. In a future I may want to have specific button for just one control in specific.
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSTICK)
         {
             isAutoPlayMode = !isAutoPlayMode;
@@ -127,7 +127,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -6)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -7)
         {
             gameStatus--;
         }
@@ -324,8 +324,11 @@ void update(float deltaTime)
         }
     }
 
-    ball.x += ballVelocityX * deltaTime;
-    ball.y += ballVelocityY * deltaTime;
+    if (gameStatus < -4 || gameStatus > 0)
+    {
+        ball.x += ballVelocityX * deltaTime;
+        ball.y += ballVelocityY * deltaTime;
+    }
 }
 
 void renderSprite(Sprite &sprite)
@@ -343,7 +346,7 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus == -6)
+    if (gameStatus == -7)
     {
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     }
@@ -378,7 +381,7 @@ void render()
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
     }
 
-    if (gameStatus < -4 || gameStatus > 2)
+    if (gameStatus < -5 || gameStatus > 2)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
         scoreBounds.x = 450;
@@ -386,7 +389,7 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
 
-    if (gameStatus < -4)
+    if (gameStatus < -5)
     {
         SDL_QueryTexture(scoreTexture2, NULL, NULL, &scoreBounds2.w, &scoreBounds2.h);
         scoreBounds2.x = 800;
