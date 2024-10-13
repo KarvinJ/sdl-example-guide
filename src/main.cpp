@@ -276,6 +276,7 @@ void update(float deltaTime)
 
         updateTextureText(scoreTexture2, std::to_string(player2Score).c_str(), fontSquare, renderer);
     }
+    
 
     else if (gameStatus < 0 && ball.x > SCREEN_WIDTH - ball.w)
     {
