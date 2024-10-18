@@ -18,6 +18,9 @@ bool isGamePaused;
 bool isAutoPlayMode;
 bool shouldClearScreen = true;
 
+SDL_Texture *playerPositionTexture = nullptr;
+SDL_Rect playerPositionBounds;
+
 SDL_Texture *pauseTexture = nullptr;
 SDL_Rect pauseBounds;
 
@@ -379,6 +382,17 @@ void render()
     if (isGamePaused)
     {
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
+    }
+
+    if (gameStatus == 0)
+    {
+        std::string playerPosition = "(" + std::to_string(playerSprite.textureBounds.x) + ", " + std::to_string(playerSprite.textureBounds.y) + ")";
+
+        updateTextureText(playerPositionTexture, playerPosition.c_str(), fontSquare, renderer);
+        SDL_QueryTexture(playerPositionTexture, NULL, NULL, &playerPositionBounds.w, &playerPositionBounds.h);
+        playerPositionBounds.x = 500;
+        playerPositionBounds.y = playerPositionBounds.h / 2 - 10;
+        SDL_RenderCopy(renderer, playerPositionTexture, NULL, &playerPositionBounds);
     }
 
     if (gameStatus < -5 || gameStatus > 2)
