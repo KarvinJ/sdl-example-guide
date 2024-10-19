@@ -18,8 +18,6 @@ bool isGamePaused;
 bool isAutoPlayMode;
 bool shouldClearScreen = true;
 
-int lines[5] = {10, 20, 30, 40, 50};
-
 SDL_Texture *playerPositionTexture = nullptr;
 SDL_Rect playerPositionBounds;
 
