@@ -18,6 +18,8 @@ bool isGamePaused;
 bool isAutoPlayMode;
 bool shouldClearScreen = true;
 
+int lines[5] = {10, 20, 30, 40, 50};
+
 SDL_Texture *playerPositionTexture = nullptr;
 SDL_Rect playerPositionBounds;
 
@@ -139,6 +141,12 @@ void handleEvents()
 
 void resetValues()
 {
+    if (gameStatus == 1)
+    {
+        playerSprite.textureBounds.x = 0;
+        playerSprite.textureBounds.y = 0;
+    }
+
     playerSprite.textureBounds.w = 38;
     playerSprite.textureBounds.h = 34;
 
@@ -370,6 +378,25 @@ void render()
         SDL_RenderFillRect(renderer, &player2);
     }
 
+    if (gameStatus == 1)
+    {
+        int newPosition = 40;
+
+        for (int i = 0; i < 18; i++)
+        {
+            SDL_RenderDrawLine(renderer, 0, newPosition, 20, newPosition);
+            newPosition += 40;
+        }
+
+        newPosition = 40;
+
+        for (int i = 0; i < 35; i++)
+        {
+            SDL_RenderDrawLine(renderer, newPosition, SCREEN_HEIGHT, newPosition, SCREEN_HEIGHT - 20);
+            newPosition += 40;
+        }
+    }
+    
     if (gameStatus > 1)
     {
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
