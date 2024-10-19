@@ -387,6 +387,7 @@ void render()
         {
             SDL_RenderDrawLine(renderer, 0, newPosition, 20, newPosition);
             SDL_RenderDrawLine(renderer, 0, newPosition + 1, 20, newPosition + 1);
+            SDL_RenderDrawLine(renderer, 0, newPosition + 2, 20, newPosition + 2);
             newPosition += 40;
         }
 
@@ -396,6 +397,7 @@ void render()
         {
             SDL_RenderDrawLine(renderer, newPosition, SCREEN_HEIGHT, newPosition, SCREEN_HEIGHT - 20);
             SDL_RenderDrawLine(renderer, newPosition + 1, SCREEN_HEIGHT, newPosition + 1, SCREEN_HEIGHT - 20);
+            SDL_RenderDrawLine(renderer, newPosition + 2, SCREEN_HEIGHT, newPosition + 2, SCREEN_HEIGHT - 20);
             newPosition += 40;
         }
     }
