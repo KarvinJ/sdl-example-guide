@@ -147,8 +147,11 @@ void resetValues()
         playerSprite.textureBounds.y = 0;
     }
 
-    playerSprite.textureBounds.w = 38;
-    playerSprite.textureBounds.h = 34;
+    if (gameStatus > -3)
+    {
+        playerSprite.textureBounds.w = 38;
+        playerSprite.textureBounds.h = 34;
+    }
 
     ball.x = SCREEN_WIDTH / 2;
     ball.y = SCREEN_HEIGHT / 2;
@@ -396,7 +399,7 @@ void render()
             newPosition += 40;
         }
     }
-    
+
     if (gameStatus > 1)
     {
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
