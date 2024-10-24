@@ -354,6 +354,29 @@ void renderSprite(Sprite &sprite)
     SDL_RenderCopy(renderer, sprite.texture, NULL, &sprite.textureBounds);
 }
 
+void drawCoordinateSystemLines()
+{
+    int newPosition = 40;
+
+    for (int i = 0; i < 18; i++)
+    {
+        SDL_RenderDrawLine(renderer, 0, newPosition, 20, newPosition);
+        SDL_RenderDrawLine(renderer, 0, newPosition + 1, 20, newPosition + 1);
+        SDL_RenderDrawLine(renderer, 0, newPosition + 2, 20, newPosition + 2);
+        newPosition += 40;
+    }
+
+    newPosition = 40;
+
+    for (int i = 0; i < 35; i++)
+    {
+        SDL_RenderDrawLine(renderer, newPosition, SCREEN_HEIGHT, newPosition, SCREEN_HEIGHT - 20);
+        SDL_RenderDrawLine(renderer, newPosition + 1, SCREEN_HEIGHT, newPosition + 1, SCREEN_HEIGHT - 20);
+        SDL_RenderDrawLine(renderer, newPosition + 2, SCREEN_HEIGHT, newPosition + 2, SCREEN_HEIGHT - 20);
+        newPosition += 40;
+    }
+}
+
 void render()
 {
     if (shouldClearScreen)
@@ -381,25 +404,7 @@ void render()
 
     if (gameStatus == 1)
     {
-        int newPosition = 40;
-
-        for (int i = 0; i < 18; i++)
-        {
-            SDL_RenderDrawLine(renderer, 0, newPosition, 20, newPosition);
-            SDL_RenderDrawLine(renderer, 0, newPosition + 1, 20, newPosition + 1);
-            SDL_RenderDrawLine(renderer, 0, newPosition + 2, 20, newPosition + 2);
-            newPosition += 40;
-        }
-
-        newPosition = 40;
-
-        for (int i = 0; i < 35; i++)
-        {
-            SDL_RenderDrawLine(renderer, newPosition, SCREEN_HEIGHT, newPosition, SCREEN_HEIGHT - 20);
-            SDL_RenderDrawLine(renderer, newPosition + 1, SCREEN_HEIGHT, newPosition + 1, SCREEN_HEIGHT - 20);
-            SDL_RenderDrawLine(renderer, newPosition + 2, SCREEN_HEIGHT, newPosition + 2, SCREEN_HEIGHT - 20);
-            newPosition += 40;
-        }
+        drawCoordinateSystemLines();
     }
 
     if (gameStatus > 1)
