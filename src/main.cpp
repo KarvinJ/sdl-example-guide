@@ -441,7 +441,7 @@ void render()
     if (gameStatus < -5 || gameStatus > 3)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
-        scoreBounds.x = 450;
+        scoreBounds.x = 410;
         scoreBounds.y = scoreBounds.h / 2 - 10;
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
@@ -487,7 +487,7 @@ int main(int argc, char *args[])
         }
     }
 
-    fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 48);
+    fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
 
     updateTextureText(scoreTexture, "0", fontSquare, renderer);
     updateTextureText(scoreTexture2, "0", fontSquare, renderer);
