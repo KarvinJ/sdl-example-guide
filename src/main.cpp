@@ -1,6 +1,6 @@
 #include "sdl_starter.h"
-#include "sdl_assets_loader.h"
 #include <time.h>
+#include <string>
 
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
@@ -14,8 +14,9 @@ Sprite playerSprite;
 
 const int PLAYER_SPEED = 600;
 
-bool isGamePaused;
-bool isAutoPlayMode;
+bool isGameRunning = true;
+bool isGamePaused = false;
+bool isAutoPlayMode = false;
 bool shouldClearScreen = true;
 
 SDL_Texture *playerPositionTexture = nullptr;
@@ -30,8 +31,8 @@ SDL_Rect scoreBounds;
 SDL_Texture *scoreTexture2 = nullptr;
 SDL_Rect scoreBounds2;
 
-int player1Score;
-int player2Score;
+int player1Score = 0;
+int player2Score = 0;
 
 int gameStatus = -1;
 
@@ -43,7 +44,7 @@ SDL_Rect ball = {SCREEN_WIDTH / 2 + 50, SCREEN_HEIGHT / 2, 32, 32};
 int ballVelocityX = 400;
 int ballVelocityY = 400;
 
-int colorIndex;
+int colorIndex = 0;
 
 SDL_Color colors[] = {
     {128, 128, 128, 0}, // gray
@@ -56,20 +57,6 @@ SDL_Color colors[] = {
     {255, 0, 255, 0},   // purple
 };
 
-void quitGame()
-{
-    Mix_FreeMusic(music);
-    Mix_FreeChunk(actionSound);
-    SDL_DestroyTexture(playerSprite.texture);
-    SDL_DestroyTexture(pauseTexture);
-    SDL_DestroyRenderer(renderer);
-    SDL_DestroyWindow(window);
-    Mix_CloseAudio();
-    IMG_Quit();
-    TTF_Quit();
-    SDL_Quit();
-}
-
 void handleEvents()
 {
     SDL_Event event;
@@ -78,8 +65,7 @@ void handleEvents()
     {
         if (event.type == SDL_QUIT || event.key.keysym.sym == SDLK_ESCAPE)
         {
-            quitGame();
-            exit(0);
+            isGameRunning = false;
         }
 
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_q)
@@ -141,14 +127,14 @@ void resetValues()
 {
     if (gameStatus == 1)
     {
-        playerSprite.textureBounds.x = 0;
-        playerSprite.textureBounds.y = 0;
+        playerSprite.bounds.x = 0;
+        playerSprite.bounds.y = 0;
     }
 
     if (gameStatus > -3)
     {
-        playerSprite.textureBounds.w = 38;
-        playerSprite.textureBounds.h = 34;
+        playerSprite.bounds.w = 38;
+        playerSprite.bounds.h = 34;
     }
 
     ball.x = SCREEN_WIDTH / 2;
@@ -158,7 +144,7 @@ void resetValues()
     updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
 }
 
-int rand_range(int min, int max)
+int getRandomNumberBetweenRange(int min, int max)
 {
     return min + rand() / (RAND_MAX / (max - min + 1) + 1);
 }
@@ -174,42 +160,42 @@ void update(float deltaTime)
 
     if (currentKeyStates[SDL_SCANCODE_LEFT])
     {
-        playerSprite.textureBounds.w--;
+        playerSprite.bounds.w--;
     }
 
     else if (currentKeyStates[SDL_SCANCODE_RIGHT])
     {
-        playerSprite.textureBounds.w++;
+        playerSprite.bounds.w++;
     }
 
     if (currentKeyStates[SDL_SCANCODE_UP])
     {
-        playerSprite.textureBounds.h--;
+        playerSprite.bounds.h--;
     }
 
     else if (currentKeyStates[SDL_SCANCODE_DOWN])
     {
-        playerSprite.textureBounds.h++;
+        playerSprite.bounds.h++;
     }
 
-    if (currentKeyStates[SDL_SCANCODE_W] && playerSprite.textureBounds.y > 0)
+    if (currentKeyStates[SDL_SCANCODE_W] && playerSprite.bounds.y > 0)
     {
-        playerSprite.textureBounds.y -= PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.y -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (currentKeyStates[SDL_SCANCODE_S] && playerSprite.textureBounds.y < SCREEN_HEIGHT - playerSprite.textureBounds.h)
+    else if (currentKeyStates[SDL_SCANCODE_S] && playerSprite.bounds.y < SCREEN_HEIGHT - playerSprite.bounds.h)
     {
-        playerSprite.textureBounds.y += PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.y += PLAYER_SPEED * deltaTime;
     }
 
-    else if (currentKeyStates[SDL_SCANCODE_A] && playerSprite.textureBounds.x > 0)
+    else if (currentKeyStates[SDL_SCANCODE_A] && playerSprite.bounds.x > 0)
     {
-        playerSprite.textureBounds.x -= PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.x -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (currentKeyStates[SDL_SCANCODE_D] && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w)
+    else if (currentKeyStates[SDL_SCANCODE_D] && playerSprite.bounds.x < SCREEN_WIDTH - playerSprite.bounds.w)
     {
-        playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.x += PLAYER_SPEED * deltaTime;
     }
 
     if (currentKeyStates[SDL_SCANCODE_I] && player2.y > 0)
@@ -229,42 +215,42 @@ void update(float deltaTime)
 
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_X))
     {
-        playerSprite.textureBounds.w--;
+        playerSprite.bounds.w--;
     }
 
     else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_B))
     {
-        playerSprite.textureBounds.w++;
+        playerSprite.bounds.w++;
     }
 
     if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_Y))
     {
-        playerSprite.textureBounds.h--;
+        playerSprite.bounds.h--;
     }
 
     else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_A))
     {
-        playerSprite.textureBounds.h++;
+        playerSprite.bounds.h++;
     }
 
-    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) && playerSprite.textureBounds.y > 0)
+    if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_UP) && playerSprite.bounds.y > 0)
     {
-        playerSprite.textureBounds.y -= PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.y -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) && playerSprite.textureBounds.y < SCREEN_HEIGHT - playerSprite.textureBounds.h)
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_DOWN) && playerSprite.bounds.y < SCREEN_HEIGHT - playerSprite.bounds.h)
     {
-        playerSprite.textureBounds.y += PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.y += PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) && playerSprite.textureBounds.x > 0)
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_LEFT) && playerSprite.bounds.x > 0)
     {
-        playerSprite.textureBounds.x -= PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.x -= PLAYER_SPEED * deltaTime;
     }
 
-    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) && playerSprite.textureBounds.x < SCREEN_WIDTH - playerSprite.textureBounds.w)
+    else if (SDL_GameControllerGetButton(controller, SDL_CONTROLLER_BUTTON_DPAD_RIGHT) && playerSprite.bounds.x < SCREEN_WIDTH - playerSprite.bounds.w)
     {
-        playerSprite.textureBounds.x += PLAYER_SPEED * deltaTime;
+        playerSprite.bounds.x += PLAYER_SPEED * deltaTime;
     }
 
     if (SDL_GameControllerGetButton(controller2, SDL_CONTROLLER_BUTTON_DPAD_UP) && player2.y > 0)
@@ -312,22 +298,22 @@ void update(float deltaTime)
     {
         ballVelocityX *= -1;
 
-        colorIndex = rand_range(0, 5);
+        colorIndex = getRandomNumberBetweenRange(0, 5);
     }
 
     else if (ball.y < 0 || ball.y > SCREEN_HEIGHT - ball.h)
     {
         ballVelocityY *= -1;
 
-        colorIndex = rand_range(0, 5);
+        colorIndex = getRandomNumberBetweenRange(0, 5);
     }
 
-    else if (SDL_HasIntersection(&playerSprite.textureBounds, &ball) || (gameStatus < -3 && SDL_HasIntersection(&player2, &ball)))
+    else if (SDL_HasIntersection(&playerSprite.bounds, &ball) || (gameStatus < -3 && SDL_HasIntersection(&player2, &ball)))
     {
         ballVelocityX *= -1;
         ballVelocityY *= -1;
 
-        colorIndex = rand_range(0, 5);
+        colorIndex = getRandomNumberBetweenRange(0, 5);
 
         if (gameStatus < -3 || gameStatus > 2)
         {
@@ -351,7 +337,7 @@ void update(float deltaTime)
 
 void renderSprite(Sprite &sprite)
 {
-    SDL_RenderCopy(renderer, sprite.texture, NULL, &sprite.textureBounds);
+    SDL_RenderCopy(renderer, sprite.texture, NULL, &sprite.bounds);
 }
 
 void drawCoordinateSystemLines()
@@ -394,7 +380,7 @@ void render()
 
     if (gameStatus != -1 && gameStatus != 5)
     {
-        SDL_RenderFillRect(renderer, &playerSprite.textureBounds);
+        SDL_RenderFillRect(renderer, &playerSprite.bounds);
     }
 
     if (gameStatus < -2)
@@ -429,7 +415,7 @@ void render()
 
     if (gameStatus == 1)
     {
-        std::string playerPosition = "(" + std::to_string(playerSprite.textureBounds.x) + ", " + std::to_string(playerSprite.textureBounds.y) + ")";
+        std::string playerPosition = "(" + std::to_string(playerSprite.bounds.x) + ", " + std::to_string(playerSprite.bounds.y) + ")";
         updateTextureText(playerPositionTexture, playerPosition.c_str(), fontSquare, renderer);
 
         SDL_QueryTexture(playerPositionTexture, NULL, NULL, &playerPositionBounds.w, &playerPositionBounds.h);
@@ -462,7 +448,7 @@ int main(int argc, char *args[])
     window = SDL_CreateWindow("My Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
     renderer = SDL_CreateRenderer(window, -1, SDL_RENDERER_ACCELERATED | SDL_RENDERER_PRESENTVSYNC);
 
-    if (startSDL(window, renderer) > 0)
+    if (startSDLSystems(window, renderer) > 0)
     {
         return 1;
     }
@@ -514,13 +500,11 @@ int main(int argc, char *args[])
     Uint32 currentFrameTime = previousFrameTime;
     float deltaTime = 0.0f;
 
-    while (true)
+    while (isGameRunning)
     {
         currentFrameTime = SDL_GetTicks();
         deltaTime = (currentFrameTime - previousFrameTime) / 1000.0f;
         previousFrameTime = currentFrameTime;
-
-        SDL_GameControllerUpdate();
 
         handleEvents();
 
@@ -533,4 +517,14 @@ int main(int argc, char *args[])
 
         capFrameRate(currentFrameTime);
     }
+
+    Mix_FreeMusic(music);
+    Mix_FreeChunk(actionSound);
+    SDL_DestroyTexture(playerSprite.texture);
+    SDL_DestroyTexture(pauseTexture);
+    SDL_DestroyRenderer(renderer);
+    SDL_DestroyWindow(window);
+    stopSDLSystems();
+
+    return 0;
 }

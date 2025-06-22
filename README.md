@@ -1,10 +1,9 @@
-# C-SDL2-Setup
-SDL2 along with SDL_ttf, SDL_image, and SDL_mixer are all you need to create a simple game in C++. This project template includes boilerplate code, and the basic project setup. 
+# pc-sdl-starter
+A Windows SDL2 starter template. 
 
 # Requirements
-g++ must be installed on your computer, to learn how to get the right version on windows, you can just watch [CoderGophers Tutorial](https://www.youtube.com/watch?v=KsG6dJlLBDw)
-mingw32 or make will hopefully come with g++, so make sure to do that.
-[Visual Studio Code](https://code.visualstudio.com/) should be installed on your computer.
+* Install the latest version of MinGW-w64 via MSYS2: [MinGW](https://code.visualstudio.com/docs/cpp/config-mingw) 
+* MinGW-w64 version use: gcc-g++ versions (Rev3, Built by MSYS2 project) 13.2.0
 
 # Building
 
@@ -38,5 +37,4 @@ to build the project in the fastest mode to have optimizations.
 
 
 # Credits
-Thanks to [PolyMars](https://www.youtube.com/c/PolyMars) for some of the build code.
-Thanks to [CoderGopher](https://www.youtube.com/channel/UCfiC4q3AahU4Io-s83-CIbQ) for most of the inspiration.
+Thanks to [PrecisionChess](https://github.com/PrecisionChess/C-SDL2-Setup?tab=readme-ov-file) for the initial code.
