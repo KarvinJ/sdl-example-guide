@@ -127,8 +127,16 @@ void resetValues()
 {
     if (gameStatus == 1)
     {
-        playerSprite.bounds.x = 0;
-        playerSprite.bounds.y = 0;
+        if (playerSprite.bounds.y < SCREEN_HEIGHT / 2)
+        {
+            playerSprite.bounds.x = 0;
+            playerSprite.bounds.y = 0;
+        }
+        else
+        {
+            playerSprite.bounds.x = 0;
+            playerSprite.bounds.y = SCREEN_HEIGHT - playerSprite.bounds.h;
+        }
     }
 
     if (gameStatus > -3)
@@ -409,7 +417,7 @@ void render()
     if (gameStatus < -5 || gameStatus > 3)
     {
         SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
-        scoreBounds.x = 410;
+        scoreBounds.x = 400;
         scoreBounds.y = scoreBounds.h / 2 - 10;
         SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
     }
@@ -445,16 +453,6 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0))
-    {
-        controller = SDL_GameControllerOpen(0);
-    }
-
-    if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
-    {
-        controller2 = SDL_GameControllerOpen(1);
-    }
-
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
 
     updateTextureText(scoreTexture, "0", fontSquare, renderer);
@@ -484,6 +482,17 @@ int main(int argc, char *args[])
 
     while (isGameRunning)
     {
+
+        if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0))
+        {
+            controller = SDL_GameControllerOpen(0);
+        }
+
+        if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
+        {
+            controller2 = SDL_GameControllerOpen(1);
+        }
+
         currentFrameTime = SDL_GetTicks();
         deltaTime = (currentFrameTime - previousFrameTime) / 1000.0f;
         previousFrameTime = currentFrameTime;
