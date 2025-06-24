@@ -7,6 +7,9 @@ SDL_Renderer *renderer = nullptr;
 SDL_GameController *controller = nullptr;
 SDL_GameController *controller2 = nullptr;
 
+const char *controllerName = "";
+const char *controller2Name = "";
+
 Mix_Chunk *actionSound = nullptr;
 Mix_Music *music = nullptr;
 
@@ -18,6 +21,12 @@ bool isGameRunning = true;
 bool isGamePaused = false;
 bool isAutoPlayMode = false;
 bool shouldClearScreen = true;
+
+SDL_Texture *controllerNameTexture = nullptr;
+SDL_Rect controllerNameBounds;
+
+SDL_Texture *controller2NameTexture = nullptr;
+SDL_Rect controller2NameBounds;
 
 SDL_Texture *playerPositionTexture = nullptr;
 SDL_Rect playerPositionBounds;
@@ -435,6 +444,20 @@ void render()
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     }
 
+    updateTextureText(controllerNameTexture, controllerName, fontSquare, renderer);
+
+    SDL_QueryTexture(controllerNameTexture, NULL, NULL, &controllerNameBounds.w, &controllerNameBounds.h);
+    controllerNameBounds.x = 150;
+    controllerNameBounds.y = controllerNameBounds.h / 2 - 10;
+    SDL_RenderCopy(renderer, controllerNameTexture, NULL, &controllerNameBounds);
+
+    updateTextureText(controller2NameTexture, controller2Name, fontSquare, renderer);
+
+    SDL_QueryTexture(controller2NameTexture, NULL, NULL, &controller2NameBounds.w, &controller2NameBounds.h);
+    controller2NameBounds.x = 150;
+    controller2NameBounds.y = controller2NameBounds.h / 2 + 400;
+    SDL_RenderCopy(renderer, controller2NameTexture, NULL, &controller2NameBounds);
+
     if (isGamePaused)
     {
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
@@ -454,6 +477,9 @@ int main(int argc, char *args[])
     }
 
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
+
+    updateTextureText(controllerNameTexture, "No Connected", fontSquare, renderer);
+    updateTextureText(controller2NameTexture, "No Connected", fontSquare, renderer);
 
     updateTextureText(scoreTexture, "0", fontSquare, renderer);
     updateTextureText(scoreTexture2, "0", fontSquare, renderer);
@@ -486,11 +512,13 @@ int main(int argc, char *args[])
         if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0))
         {
             controller = SDL_GameControllerOpen(0);
+            controllerName = SDL_GameControllerName(controller);
         }
 
         if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
         {
             controller2 = SDL_GameControllerOpen(1);
+            controller2Name = SDL_GameControllerName(controller2);
         }
 
         currentFrameTime = SDL_GetTicks();
