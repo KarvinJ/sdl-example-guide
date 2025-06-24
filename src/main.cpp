@@ -335,11 +335,6 @@ void update(float deltaTime)
     }
 }
 
-void renderSprite(Sprite &sprite)
-{
-    SDL_RenderCopy(renderer, sprite.texture, NULL, &sprite.bounds);
-}
-
 void drawCoordinateSystemLines()
 {
     int newPosition = 40;
@@ -373,11 +368,6 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus == -7)
-    {
-        SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
-    }
-
     if (gameStatus != -1 && gameStatus != 5)
     {
         SDL_RenderFillRect(renderer, &playerSprite.bounds);
@@ -391,6 +381,14 @@ void render()
     if (gameStatus == 1)
     {
         drawCoordinateSystemLines();
+
+        std::string playerPosition = "(" + std::to_string(playerSprite.bounds.x) + ", " + std::to_string(playerSprite.bounds.y) + ")";
+        updateTextureText(playerPositionTexture, playerPosition.c_str(), fontSquare, renderer);
+
+        SDL_QueryTexture(playerPositionTexture, NULL, NULL, &playerPositionBounds.w, &playerPositionBounds.h);
+        playerPositionBounds.x = 500;
+        playerPositionBounds.y = playerPositionBounds.h / 2 - 10;
+        SDL_RenderCopy(renderer, playerPositionTexture, NULL, &playerPositionBounds);
     }
 
     if (gameStatus > 1)
@@ -405,23 +403,7 @@ void render()
 
     if (gameStatus > 4)
     {
-        renderSprite(playerSprite);
-    }
-
-    if (isGamePaused)
-    {
-        SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
-    }
-
-    if (gameStatus == 1)
-    {
-        std::string playerPosition = "(" + std::to_string(playerSprite.bounds.x) + ", " + std::to_string(playerSprite.bounds.y) + ")";
-        updateTextureText(playerPositionTexture, playerPosition.c_str(), fontSquare, renderer);
-
-        SDL_QueryTexture(playerPositionTexture, NULL, NULL, &playerPositionBounds.w, &playerPositionBounds.h);
-        playerPositionBounds.x = 500;
-        playerPositionBounds.y = playerPositionBounds.h / 2 - 10;
-        SDL_RenderCopy(renderer, playerPositionTexture, NULL, &playerPositionBounds);
+        renderSprite(renderer, playerSprite);
     }
 
     if (gameStatus < -5 || gameStatus > 3)
@@ -440,6 +422,16 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
+    if (gameStatus == -7)
+    {
+        SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+    }
+
+    if (isGamePaused)
+    {
+        SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
+    }
+
     SDL_RenderPresent(renderer);
 }
 
@@ -453,24 +445,14 @@ int main(int argc, char *args[])
         return 1;
     }
 
-    if (SDL_NumJoysticks() < 1)
-    {
-        printf("No game controllers connected!\n");
-    }
-    else
+    if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0))
     {
         controller = SDL_GameControllerOpen(0);
-        if (controller == NULL)
-        {
-            printf("Unable to open game controller! SDL Error: %s\n", SDL_GetError());
-            return -1;
-        }
+    }
 
+    if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
+    {
         controller2 = SDL_GameControllerOpen(1);
-        if (controller2 == NULL)
-        {
-            printf("Unable to open game controller! SDL Error: %s\n", SDL_GetError());
-        }
     }
 
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
@@ -515,7 +497,7 @@ int main(int argc, char *args[])
 
         render();
 
-        capFrameRate(currentFrameTime);
+        // capFrameRate(currentFrameTime);
     }
 
     Mix_FreeMusic(music);
