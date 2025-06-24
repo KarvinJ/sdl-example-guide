@@ -295,7 +295,6 @@ void update(float deltaTime)
         ballVelocityY *= -1;
 
         player2Score++;
-
         updateTextureText(scoreTexture2, std::to_string(player2Score).c_str(), fontSquare, renderer);
     }
 
@@ -308,21 +307,18 @@ void update(float deltaTime)
         ballVelocityY *= -1;
 
         player1Score++;
-
         updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
     }
 
     if (gameStatus > 0 && (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w))
     {
         ballVelocityX *= -1;
-
         colorIndex = getRandomNumberBetweenRange(0, 5);
     }
 
     else if (ball.y < 0 || ball.y > SCREEN_HEIGHT - ball.h)
     {
         ballVelocityY *= -1;
-
         colorIndex = getRandomNumberBetweenRange(0, 5);
     }
 
@@ -341,7 +337,6 @@ void update(float deltaTime)
         if (gameStatus > 3)
         {
             player1Score++;
-
             updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
         }
     }
