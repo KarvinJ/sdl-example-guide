@@ -46,6 +46,7 @@ int player2Score = 0;
 int gameStatus = -1;
 
 TTF_Font *fontSquare = nullptr;
+TTF_Font *fontStart = nullptr;
 
 SDL_Rect player2 = {SCREEN_WIDTH - 32, SCREEN_HEIGHT / 2, 16, 96};
 SDL_Rect ball = {SCREEN_WIDTH / 2 + 50, SCREEN_HEIGHT / 2, 32, 32};
@@ -375,6 +376,23 @@ void drawCoordinateSystemLines()
     }
 }
 
+void displayConnectedControllersName()
+{
+    updateTextureText(controllerNameTexture, controllerName, fontStart, renderer);
+
+    SDL_QueryTexture(controllerNameTexture, NULL, NULL, &controllerNameBounds.w, &controllerNameBounds.h);
+    controllerNameBounds.x = 50;
+    controllerNameBounds.y = controllerNameBounds.h / 2;
+    SDL_RenderCopy(renderer, controllerNameTexture, NULL, &controllerNameBounds);
+
+    updateTextureText(controller2NameTexture, controller2Name, fontStart, renderer);
+
+    SDL_QueryTexture(controller2NameTexture, NULL, NULL, &controller2NameBounds.w, &controller2NameBounds.h);
+    controller2NameBounds.x = SCREEN_WIDTH - controller2NameBounds.w - 50;
+    controller2NameBounds.y = controller2NameBounds.h / 2;
+    SDL_RenderCopy(renderer, controller2NameTexture, NULL, &controller2NameBounds);
+}
+
 void render()
 {
     if (shouldClearScreen)
@@ -439,24 +457,16 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
+    if (gameStatus == -1)
+    {
+        displayConnectedControllersName();
+    }
+
     if (gameStatus == -7)
     {
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+        displayConnectedControllersName();
     }
-
-    updateTextureText(controllerNameTexture, controllerName, fontSquare, renderer);
-
-    SDL_QueryTexture(controllerNameTexture, NULL, NULL, &controllerNameBounds.w, &controllerNameBounds.h);
-    controllerNameBounds.x = 150;
-    controllerNameBounds.y = controllerNameBounds.h / 2 - 10;
-    SDL_RenderCopy(renderer, controllerNameTexture, NULL, &controllerNameBounds);
-
-    updateTextureText(controller2NameTexture, controller2Name, fontSquare, renderer);
-
-    SDL_QueryTexture(controller2NameTexture, NULL, NULL, &controller2NameBounds.w, &controller2NameBounds.h);
-    controller2NameBounds.x = 150;
-    controller2NameBounds.y = controller2NameBounds.h / 2 + 400;
-    SDL_RenderCopy(renderer, controller2NameTexture, NULL, &controller2NameBounds);
 
     if (isGamePaused)
     {
@@ -477,9 +487,10 @@ int main(int argc, char *args[])
     }
 
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
+    fontStart = TTF_OpenFont("res/fonts/PressStart2P.ttf", 20);
 
-    updateTextureText(controllerNameTexture, "No Connected", fontSquare, renderer);
-    updateTextureText(controller2NameTexture, "No Connected", fontSquare, renderer);
+    updateTextureText(controllerNameTexture, "No Connected", fontStart, renderer);
+    updateTextureText(controller2NameTexture, "No Connected", fontStart, renderer);
 
     updateTextureText(scoreTexture, "0", fontSquare, renderer);
     updateTextureText(scoreTexture2, "0", fontSquare, renderer);
@@ -508,17 +519,24 @@ int main(int argc, char *args[])
 
     while (isGameRunning)
     {
-
         if (SDL_NumJoysticks() > 0 && SDL_IsGameController(0))
         {
             controller = SDL_GameControllerOpen(0);
             controllerName = SDL_GameControllerName(controller);
+        }
+        else
+        {
+            controllerName = "No Connected";
         }
 
         if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
         {
             controller2 = SDL_GameControllerOpen(1);
             controller2Name = SDL_GameControllerName(controller2);
+        }
+        else
+        {
+            controller2Name = "No Connected";
         }
 
         currentFrameTime = SDL_GetTicks();
@@ -541,6 +559,11 @@ int main(int argc, char *args[])
     Mix_FreeChunk(actionSound);
     SDL_DestroyTexture(playerSprite.texture);
     SDL_DestroyTexture(pauseTexture);
+    SDL_DestroyTexture(playerPositionTexture);
+    SDL_DestroyTexture(scoreTexture);
+    SDL_DestroyTexture(scoreTexture2);
+    SDL_DestroyTexture(controllerNameTexture);
+    SDL_DestroyTexture(controller2NameTexture);
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
     stopSDLSystems();
