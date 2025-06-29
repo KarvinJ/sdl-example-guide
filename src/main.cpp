@@ -491,7 +491,6 @@ int main(int argc, char *args[])
     updateTextureText(scoreTexture2, "0", fontSquare, renderer);
 
     updateTextureText(pauseTexture, "Game Paused", fontSquare, renderer);
-
     SDL_QueryTexture(pauseTexture, NULL, NULL, &pauseBounds.w, &pauseBounds.h);
     pauseBounds.x = SCREEN_WIDTH / 2 - pauseBounds.w / 2;
     pauseBounds.y = 100;
@@ -499,13 +498,10 @@ int main(int argc, char *args[])
     playerSprite = loadSprite(renderer, "res/sprites/alien_1.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     actionSound = loadSound("res/sounds/magic.wav");
-
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
 
-    music = loadMusic("res/music/music.wav");
-
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
-
+    // music = loadMusic("res/music/music.wav");
+    // Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
     // Mix_PlayMusic(music, -1);
 
     Uint32 previousFrameTime = SDL_GetTicks();
@@ -546,8 +542,6 @@ int main(int argc, char *args[])
         }
 
         render();
-
-        // capFrameRate(currentFrameTime);
     }
 
     Mix_FreeMusic(music);
