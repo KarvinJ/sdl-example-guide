@@ -15,11 +15,12 @@ set(SDL2TTF_VENDORED 1)
 
 set(SDL2TTF_SDL2_REQUIRED_VERSION 2.0.10)
 
+get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR} REALPATH)
 get_filename_component(prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(exec_prefix "${prefix}")
-set(bindir "${exec_prefix}/bin")
+set(bindir "${prefix}/bin")
 set(includedir "${prefix}/include")
-set(libdir "${exec_prefix}/lib")
+set(libdir "${prefix}/lib")
 set(_sdl2ttf_extra_static_libraries " -lusp10 -lgdi32 -lrpcrt4  -lusp10 -lgdi32 -lrpcrt4")
 string(STRIP "${_sdl2ttf_extra_static_libraries}" _sdl2ttf_extra_static_libraries)
 

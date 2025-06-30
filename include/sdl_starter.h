@@ -27,6 +27,10 @@ Mix_Music *loadMusic(const char *filePath);
 
 void updateTextureText(SDL_Texture *&texture, const char *text, TTF_Font *&fontSquare, SDL_Renderer *renderer);
 
+void SDL_RenderDrawCircle(SDL_Renderer *renderer, int x, int y, int radius);
+
+void SDL_RenderFillCircle(SDL_Renderer *renderer, int x, int y, int radius);
+
 void stopSDLSystems();
 
 void capFrameRate(Uint32 frameStartTime);

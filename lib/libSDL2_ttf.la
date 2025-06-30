@@ -17,14 +17,14 @@ old_library='libSDL2_ttf.a'
 inherited_linker_flags=''
 
 # Libraries that this one depends upon.
-dependency_libs=' -lusp10 -lrpcrt4 -L/usr/local/x86_64-w64-mingw32/lib /usr/local/x86_64-w64-mingw32/lib/libSDL2.la -ldinput8 -ldxguid -ldxerr8 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lsetupapi -lversion -luuid /opt/homebrew/Cellar/mingw-w64/10.0.0_4/toolchain-x86_64/x86_64-w64-mingw32/lib/../lib/libstdc++.la'
+dependency_libs=' -L/home/runner/work/SDL_ttf/SDL_ttf/deps/mingw-deps/x86_64-w64-mingw32/lib -lusp10 -lrpcrt4 -lmingw32 /home/runner/work/SDL_ttf/SDL_ttf/deps/mingw-deps/x86_64-w64-mingw32/lib/libSDL2.la -ldinput8 -ldxguid -ldxerr8 -luser32 -lgdi32 -lwinmm -limm32 -lole32 -loleaut32 -lshell32 -lsetupapi -lversion -luuid'
 
 # Names of additional weak libraries provided by this library
 weak_library_names=''
 
 # Version information for libSDL2_ttf.
-current=2200
-age=2200
+current=2400
+age=2400
 revision=0
 
 # Is this an already installed library?
@@ -38,4 +38,4 @@ dlopen=''
 dlpreopen=''
 
 # Directory that this library needs to be installed in:
-libdir='/Users/valve/release/SDL2_ttf/SDL2_ttf-2.22.0/x86_64-w64-mingw32/lib'
+libdir='/tmp/tardir/SDL2_ttf-2.24.0/build-mingw/install-x86_64-w64-mingw32/lib'

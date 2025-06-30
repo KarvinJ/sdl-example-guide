@@ -20,8 +20,10 @@ else()
     set(SDL2MIXER_FLAC              0)
 endif()
 
+set(SDL2MIXER_GME                   1)
+
 set(SDL2MIXER_MOD_MODPLUG           0)
-set(SDL2MIXER_MOD_XMP               0)
+set(SDL2MIXER_MOD_XMP               1)
 set(SDL2MIXER_MOD_XMP_LITE          0)
 if(SDL2MIXER_MOD_MODPLUG OR SDL2MIXER_MOD_XMP OR SDL2MIXER_MOD_XMP_LITE)
     set(SDL2MIXER_MOD               1)
@@ -29,9 +31,9 @@ else()
     set(SDL2MIXER_MOD               0)
 endif()
 
-set(SDL2MIXER_MP3_DRMP3             1)
+set(SDL2MIXER_MP3_MINIMP3           1)
 set(SDL2MIXER_MP3_MPG123            0)
-if(SDL2MIXER_MP3_DRMP3 OR SDL2MIXER_MP3_MPG123)
+if(SDL2MIXER_MP3_MINIMP3 OR SDL2MIXER_MP3_MPG123)
     set(SDL2MIXER_MP3               1)
 else()
     set(SDL2MIXER_MP3               0)
@@ -46,7 +48,7 @@ else()
     set(SDL2MIXER_MIDI              0)
 endif()
 
-set(SDL2MIXER_OPUS                  0)
+set(SDL2MIXER_OPUS                  1)
 
 set(SDL2MIXER_VORBIS)
 set(SDL2MIXER_VORBIS_STB            1)
@@ -64,24 +66,72 @@ endif()
 
 set(SDL2MIXER_WAVE                  1)
 
+set(SDL2MIXER_WAVPACK               1)
+
 set(SDL2MIXER_SDL2_REQUIRED_VERSION 2.0.9)
 
+get_filename_component(CMAKE_CURRENT_LIST_DIR ${CMAKE_CURRENT_LIST_DIR} REALPATH)
 get_filename_component(prefix "${CMAKE_CURRENT_LIST_DIR}/../../.." ABSOLUTE)
 set(exec_prefix "${prefix}")
-set(bindir "${exec_prefix}/bin")
+set(bindir "${prefix}/bin")
 set(includedir "${prefix}/include")
-set(libdir "${exec_prefix}/lib")
-set(_sdl2mixer_extra_static_libraries " -lwinmm -lm  -lwinmm")
-string(STRIP "${_sdl2mixer_extra_static_libraries}" _sdl2mixer_extra_static_libraries)
+set(libdir "${prefix}/lib")
+set(_sdl2mixer_extra_static_libraries ";winmm")
+string(REGEX REPLACE "(^[;]+|[;]+$)" "" _sdl2mixer_extra_static_libraries "${_sdl2mixer_extra_static_libraries}")
 
 set(_sdl2mixer_bindir   "${bindir}")
 set(_sdl2mixer_libdir   "${libdir}")
 set(_sdl2mixer_incdir   "${includedir}/SDL2")
 
-# Convert _sdl2mixer_extra_static_libraries to list and keep only libraries
-string(REGEX MATCHALL "(-[lm]([-a-zA-Z0-9._]+))|(-Wl,[^ ]*framework[^ ]*)" _sdl2mixer_extra_static_libraries "${_sdl2mixer_extra_static_libraries}")
-string(REGEX REPLACE "^-l" "" _sdl2mixer_extra_static_libraries "${_sdl2mixer_extra_static_libraries}")
-string(REGEX REPLACE ";-l" ";" _sdl2mixer_extra_static_libraries "${_sdl2mixer_extra_static_libraries}")
+include(CMakeFindDependencyMacro)
+
+set(_original_cmake_module_path "${CMAKE_MODULE_PATH}")
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_LIST_DIR}")
+
+include("${CMAKE_CURRENT_LIST_DIR}/PkgConfigHelper.cmake")
+
+if("modplug::modplug" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(modplug)
+endif()
+
+if("libxmp::libxmp" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(libxmp)
+endif()
+
+if("libxmp-lite::libxmp-lite" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(libxmp-lite)
+endif()
+
+if("FluidSynth::libfluidsynth" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(FluidSynth)
+endif()
+
+if("Vorbis::vorbisfile" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(Vorbis)
+endif()
+
+if("tremor::tremor" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(tremor)
+endif()
+
+if("FLAC::FLAC" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(FLAC)
+endif()
+
+if("MPG123::libmpg123" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(mpg123)
+endif()
+
+if("OpusFile::opusfile" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(OpusFile)
+endif()
+
+if("WavPack::WavPack" IN_LIST _sdl2mixer_extra_static_libraries)
+    find_dependency(wavpack)
+endif()
+
+set(CMAKE_MODULE_PATH "${_original_cmake_module_path}")
+unset(_original_cmake_module_path)
 
 unset(prefix)
 unset(exec_prefix)
