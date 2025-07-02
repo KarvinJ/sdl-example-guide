@@ -116,6 +116,74 @@ void updateTextureText(SDL_Texture *&texture, const char *text, TTF_Font *&fontS
     SDL_FreeSurface(surface);
 }
 
+void SDL_RenderDrawCircle(SDL_Renderer *renderer, int x, int y, int radius)
+{
+    int offsetx = 0; 
+    int offsety = radius; 
+    int diameter = radius - 1;
+
+    while (offsety >= offsetx)
+    {
+        SDL_RenderDrawPoint(renderer, x + offsetx, y + offsety);
+        SDL_RenderDrawPoint(renderer, x - offsetx, y + offsety);
+        SDL_RenderDrawPoint(renderer, x + offsety, y + offsetx);
+        SDL_RenderDrawPoint(renderer, x - offsety, y + offsetx);
+        SDL_RenderDrawPoint(renderer, x + offsetx, y - offsety);
+        SDL_RenderDrawPoint(renderer, x + offsety, y - offsetx);
+        SDL_RenderDrawPoint(renderer, x - offsetx, y - offsety);
+        SDL_RenderDrawPoint(renderer, x - offsety, y - offsetx);
+
+        if (diameter >= 2 * offsetx)
+        {
+            diameter -= 2 * offsetx + 1;
+            offsetx += 1;
+        }
+        else if (diameter < 2 * (radius - offsety))
+        {
+            diameter += 2 * offsety - 1;
+            offsety -= 1;
+        }
+        else
+        {
+            diameter += 2 * (offsety - offsetx - 1);
+            offsety -= 1;
+            offsetx += 1;
+        }
+    }
+}
+
+void SDL_RenderFillCircle(SDL_Renderer *renderer, int x, int y, int radius)
+{
+    int offsetx = 0; 
+    int offsety = radius; 
+    int diameter  = radius - 1;
+
+    while (offsety >= offsetx)
+    {
+        SDL_RenderDrawLine(renderer, x - offsety, y + offsetx, x + offsety, y + offsetx);
+        SDL_RenderDrawLine(renderer, x - offsetx, y + offsety, x + offsetx, y + offsety);
+        SDL_RenderDrawLine(renderer, x - offsetx, y - offsety, x + offsetx, y - offsety);
+        SDL_RenderDrawLine(renderer, x - offsety, y - offsetx, x + offsety, y - offsetx);
+
+        if (diameter >= 2 * offsetx)
+        {
+            diameter -= 2 * offsetx + 1;
+            offsetx += 1;
+        }
+        else if (diameter < 2 * (radius - offsety))
+        {
+            diameter += 2 * offsety - 1;
+            offsety -= 1;
+        }
+        else
+        {
+            diameter += 2 * (offsety - offsetx - 1);
+            offsety -= 1;
+            offsetx += 1;
+        }
+    }
+}
+
 void stopSDLSystems()
 {
     Mix_CloseAudio();

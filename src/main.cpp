@@ -67,6 +67,9 @@ SDL_Color colors[] = {
     {255, 0, 255, 0},   // purple
 };
 
+SDL_Color darkGreen = {20, 160, 133, 255};
+SDL_Color lightGreen = {129, 204, 184, 255};
+
 void handleEvents()
 {
     SDL_Event event;
@@ -99,7 +102,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -7)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -9)
         {
             gameStatus--;
         }
@@ -393,6 +396,12 @@ void render()
     if (shouldClearScreen)
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
+
+        if (gameStatus < -7)
+        {
+            SDL_SetRenderDrawColor(renderer, darkGreen.r, darkGreen.g, darkGreen.b, darkGreen.a);
+        }
+
         SDL_RenderClear(renderer);
     }
 
@@ -457,10 +466,18 @@ void render()
         displayConnectedControllersName();
     }
 
-    if (gameStatus == -7)
+    if (gameStatus < -7)
     {
-        SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+        SDL_SetRenderDrawColor(renderer, lightGreen.r, lightGreen.g, lightGreen.b, lightGreen.a);
+        SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
+    }
+
+    if (gameStatus < -6)
+    {
         displayConnectedControllersName();
+
+        SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
+        SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     }
 
     if (isGamePaused)
