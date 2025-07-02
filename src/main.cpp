@@ -11,7 +11,7 @@ const char *controllerName = "";
 const char *controller2Name = "";
 
 Mix_Chunk *actionSound = nullptr;
-Mix_Music *music = nullptr;
+// Mix_Music *music = nullptr;
 
 Sprite playerSprite;
 
@@ -544,7 +544,7 @@ int main(int argc, char *args[])
         render();
     }
 
-    Mix_FreeMusic(music);
+    // Mix_FreeMusic(music);
     Mix_FreeChunk(actionSound);
     SDL_DestroyTexture(playerSprite.texture);
     SDL_DestroyTexture(pauseTexture);
