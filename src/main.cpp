@@ -67,9 +67,6 @@ SDL_Color colors[] = {
     {255, 0, 255, 0},   // purple
 };
 
-SDL_Color darkGreen = {20, 160, 133, 255};
-SDL_Color lightGreen = {129, 204, 184, 255};
-
 void handleEvents()
 {
     SDL_Event event;
@@ -399,6 +396,7 @@ void render()
 
         if (gameStatus < -7)
         {
+            SDL_Color darkGreen = {20, 160, 133, 255};
             SDL_SetRenderDrawColor(renderer, darkGreen.r, darkGreen.g, darkGreen.b, darkGreen.a);
         }
 
@@ -430,16 +428,6 @@ void render()
         SDL_RenderCopy(renderer, playerPositionTexture, NULL, &playerPositionBounds);
     }
 
-    if (gameStatus > 1)
-    {
-        SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
-    }
-
-    if (gameStatus > 1 || gameStatus < -3)
-    {
-        SDL_RenderFillRect(renderer, &ball);
-    }
-
     if (gameStatus > 4)
     {
         renderSprite(renderer, playerSprite);
@@ -468,6 +456,7 @@ void render()
 
     if (gameStatus < -7)
     {
+        SDL_Color lightGreen = {129, 204, 184, 255};
         SDL_SetRenderDrawColor(renderer, lightGreen.r, lightGreen.g, lightGreen.b, lightGreen.a);
         SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
     }
@@ -478,6 +467,16 @@ void render()
 
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
+    }
+
+    if (gameStatus > 1)
+    {
+        SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
+    }
+
+    if (gameStatus > 1 || gameStatus < -3)
+    {
+        SDL_RenderFillRect(renderer, &ball);
     }
 
     if (isGamePaused)
