@@ -449,16 +449,16 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
-    if (gameStatus == -1)
-    {
-        displayConnectedControllersName();
-    }
-
     if (gameStatus < -7)
     {
         SDL_Color lightGreen = {129, 204, 184, 255};
         SDL_SetRenderDrawColor(renderer, lightGreen.r, lightGreen.g, lightGreen.b, lightGreen.a);
         SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
+    }
+
+    if (gameStatus == -1)
+    {
+        displayConnectedControllersName();
     }
 
     if (gameStatus < -6)
