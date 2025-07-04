@@ -474,6 +474,12 @@ void render()
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
     }
 
+    if (gameStatus < -7)
+    {
+        SDL_Color yellow = {253, 249, 0, 255};
+        SDL_SetRenderDrawColor(renderer, yellow.r, yellow.g, yellow.b, yellow.a);
+    }
+
     if (gameStatus > 1 || gameStatus < -3)
     {
         SDL_RenderFillRect(renderer, &ball);
