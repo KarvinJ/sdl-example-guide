@@ -1,6 +1,9 @@
 #include "sdl_starter.h"
 #include <time.h>
 #include <string>
+#include <vector>
+
+using std::vector;
 
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
@@ -66,6 +69,45 @@ SDL_Color colors[] = {
     {0, 255, 255, 0},   // cyan
     {255, 0, 255, 0},   // purple
 };
+
+typedef struct
+{
+    SDL_Rect bounds;
+    bool isDestroyed;
+    int points;
+} Brick;
+
+vector<Brick> createBricks()
+{
+    vector<Brick> bricks;
+
+    // 10*12 Bricks
+    bricks.reserve(120);
+
+    int brickPoints = 10;
+    int positionX = 0;
+    int positionY = 80;
+
+    for (int row = 0; row < 10; row++)
+    {
+        positionX = 6;
+
+        for (int column = 0; column < 12; column++)
+        {
+            Brick actualBrick = {{positionX, positionY, 102, 20}, false, brickPoints};
+
+            bricks.push_back(actualBrick);
+            positionX += 106;
+        }
+
+        brickPoints--;
+        positionY += 22;
+    }
+
+    return bricks;
+}
+
+vector<Brick> bricks = createBricks();
 
 void handleEvents()
 {
@@ -288,26 +330,34 @@ void update(float deltaTime)
 
     if (gameStatus < 0 && ball.x < 0)
     {
-        ball.x = SCREEN_WIDTH / 2 - ball.w;
-        ball.y = SCREEN_HEIGHT / 2 - ball.h;
-
         ballVelocityX *= -1;
-        ballVelocityY *= -1;
 
-        player2Score++;
-        updateTextureText(scoreTexture2, std::to_string(player2Score).c_str(), fontSquare, renderer);
+        if (gameStatus != -9)
+        {
+            ballVelocityY *= -1;
+
+            ball.x = SCREEN_WIDTH / 2 - ball.w;
+            ball.y = SCREEN_HEIGHT / 2 - ball.h;
+
+            player2Score++;
+            updateTextureText(scoreTexture2, std::to_string(player2Score).c_str(), fontSquare, renderer);
+        }
     }
 
     else if (gameStatus < 0 && ball.x > SCREEN_WIDTH - ball.w)
     {
-        ball.x = SCREEN_WIDTH / 2 - ball.w;
-        ball.y = SCREEN_HEIGHT / 2 - ball.h;
-
         ballVelocityX *= -1;
-        ballVelocityY *= -1;
 
-        player1Score++;
-        updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
+        if (gameStatus != -9)
+        {
+            ballVelocityY *= -1;
+
+            ball.x = SCREEN_WIDTH / 2;
+            ball.y = SCREEN_HEIGHT / 2;
+
+            player1Score++;
+            updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
+        }
     }
 
     if (gameStatus > 0 && (ball.x < 0 || ball.x > SCREEN_WIDTH - ball.w))
@@ -322,10 +372,14 @@ void update(float deltaTime)
         colorIndex = getRandomNumberBetweenRange(0, 5);
     }
 
-    else if (SDL_HasIntersection(&playerSprite.bounds, &ball) || (gameStatus < -3 && SDL_HasIntersection(&player2, &ball)))
+    else if (SDL_HasIntersection(&playerSprite.bounds, &ball) || (gameStatus < -3 && gameStatus > -9 && SDL_HasIntersection(&player2, &ball)))
     {
-        ballVelocityX *= -1;
         ballVelocityY *= -1;
+
+        if (gameStatus != -9)
+        {
+            ballVelocityX *= -1;
+        }
 
         colorIndex = getRandomNumberBetweenRange(0, 5);
 
@@ -338,6 +392,32 @@ void update(float deltaTime)
         {
             player1Score++;
             updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
+        }
+    }
+
+    if (gameStatus == -9)
+    {
+        for (auto actualBrick = bricks.begin(); actualBrick != bricks.end();)
+        {
+            if (!actualBrick->isDestroyed && SDL_HasIntersection(&actualBrick->bounds, &ball))
+            {
+                ballVelocityY *= -1;
+                actualBrick->isDestroyed = true;
+
+                player1Score += actualBrick->points;
+
+                updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
+                Mix_PlayChannel(-1, actionSound, 0);
+            }
+
+            if (actualBrick->isDestroyed)
+            {
+                bricks.erase(actualBrick);
+            }
+            else
+            {
+                actualBrick++;
+            }
         }
     }
 
@@ -394,7 +474,7 @@ void render()
     {
         SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
 
-        if (gameStatus < -7)
+        if (gameStatus == -8)
         {
             SDL_Color darkGreen = {20, 160, 133, 255};
             SDL_SetRenderDrawColor(renderer, darkGreen.r, darkGreen.g, darkGreen.b, darkGreen.a);
@@ -410,7 +490,7 @@ void render()
         SDL_RenderFillRect(renderer, &playerSprite.bounds);
     }
 
-    if (gameStatus < -2)
+    if (gameStatus < -2 && gameStatus > -9)
     {
         SDL_RenderFillRect(renderer, &player2);
     }
@@ -433,23 +513,7 @@ void render()
         renderSprite(renderer, playerSprite);
     }
 
-    if (gameStatus < -5 || gameStatus > 3)
-    {
-        SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
-        scoreBounds.x = 400;
-        scoreBounds.y = scoreBounds.h / 2 - 10;
-        SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
-    }
-
-    if (gameStatus < -5)
-    {
-        SDL_QueryTexture(scoreTexture2, NULL, NULL, &scoreBounds2.w, &scoreBounds2.h);
-        scoreBounds2.x = 800;
-        scoreBounds2.y = scoreBounds.h / 2 - 10;
-        SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
-    }
-
-    if (gameStatus < -7)
+    if (gameStatus == -8)
     {
         SDL_Color lightGreen = {129, 204, 184, 255};
         SDL_SetRenderDrawColor(renderer, lightGreen.r, lightGreen.g, lightGreen.b, lightGreen.a);
@@ -461,7 +525,7 @@ void render()
         displayConnectedControllersName();
     }
 
-    if (gameStatus < -6)
+    if (gameStatus < -6 && gameStatus > -9)
     {
         displayConnectedControllersName();
 
@@ -474,6 +538,15 @@ void render()
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
     }
 
+    if (gameStatus < -8)
+    {
+        for (Brick brick : bricks)
+        {
+            if (!brick.isDestroyed)
+                SDL_RenderFillRect(renderer, &brick.bounds);
+        }
+    }
+
     if (gameStatus < -7)
     {
         SDL_Color yellow = {253, 249, 0, 255};
@@ -483,6 +556,22 @@ void render()
     if (gameStatus > 1 || gameStatus < -3)
     {
         SDL_RenderFillRect(renderer, &ball);
+    }
+
+    if (gameStatus < -5 || gameStatus > 3)
+    {
+        SDL_QueryTexture(scoreTexture, NULL, NULL, &scoreBounds.w, &scoreBounds.h);
+        scoreBounds.x = 400;
+        scoreBounds.y = scoreBounds.h / 2 - 50;
+        SDL_RenderCopy(renderer, scoreTexture, NULL, &scoreBounds);
+    }
+
+    if (gameStatus < -5 && gameStatus > -9)
+    {
+        SDL_QueryTexture(scoreTexture2, NULL, NULL, &scoreBounds2.w, &scoreBounds2.h);
+        scoreBounds2.x = 800;
+        scoreBounds2.y = scoreBounds.h / 2 - 50;
+        SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
     if (isGamePaused)
@@ -515,7 +604,7 @@ int main(int argc, char *args[])
     updateTextureText(pauseTexture, "Game Paused", fontSquare, renderer);
     SDL_QueryTexture(pauseTexture, NULL, NULL, &pauseBounds.w, &pauseBounds.h);
     pauseBounds.x = SCREEN_WIDTH / 2 - pauseBounds.w / 2;
-    pauseBounds.y = 100;
+    pauseBounds.y = SCREEN_HEIGHT / 2 - pauseBounds.h / 2;
 
     playerSprite = loadSprite(renderer, "res/sprites/alien_1.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
@@ -539,7 +628,7 @@ int main(int argc, char *args[])
         }
         else
         {
-            controllerName = "No Connected";
+            controllerName = " ";
         }
 
         if (SDL_NumJoysticks() > 1 && SDL_IsGameController(1))
@@ -549,7 +638,7 @@ int main(int argc, char *args[])
         }
         else
         {
-            controller2Name = "No Connected";
+            controller2Name = " ";
         }
 
         currentFrameTime = SDL_GetTicks();
