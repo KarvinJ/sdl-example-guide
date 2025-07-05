@@ -141,7 +141,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -9)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -10)
         {
             gameStatus--;
         }
@@ -168,7 +168,7 @@ void handleEvents()
             gameStatus++;
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -7)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -10)
         {
             gameStatus--;
         }
@@ -332,7 +332,7 @@ void update(float deltaTime)
     {
         ballVelocityX *= -1;
 
-        if (gameStatus != -9)
+        if (gameStatus > -9)
         {
             ballVelocityY *= -1;
 
@@ -348,7 +348,7 @@ void update(float deltaTime)
     {
         ballVelocityX *= -1;
 
-        if (gameStatus != -9)
+        if (gameStatus > -9)
         {
             ballVelocityY *= -1;
 
@@ -376,7 +376,7 @@ void update(float deltaTime)
     {
         ballVelocityY *= -1;
 
-        if (gameStatus != -9)
+        if (gameStatus > -9)
         {
             ballVelocityX *= -1;
         }
@@ -395,7 +395,7 @@ void update(float deltaTime)
         }
     }
 
-    if (gameStatus == -9)
+    if (gameStatus < -9)
     {
         for (auto actualBrick = bricks.begin(); actualBrick != bricks.end();)
         {
@@ -421,7 +421,7 @@ void update(float deltaTime)
         }
     }
 
-    if (gameStatus < -4 || gameStatus > 1)
+    if ((gameStatus != -9 && gameStatus < -4) || gameStatus > 1)
     {
         ball.x += ballVelocityX * deltaTime;
         ball.y += ballVelocityY * deltaTime;
