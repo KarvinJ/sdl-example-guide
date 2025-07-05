@@ -60,21 +60,27 @@ int ballVelocityY = 400;
 int colorIndex = 0;
 
 SDL_Color colors[] = {
-    {128, 128, 128, 0}, // gray
-    {255, 255, 255, 0}, // white
-    {255, 0, 0, 0},     // red
-    {0, 255, 0, 0},     // green
-    {0, 0, 255, 0},     // blue
-    {255, 255, 0, 0},   // brown
-    {0, 255, 255, 0},   // cyan
-    {255, 0, 255, 0},   // purple
+    {128, 128, 128, 255}, // gray
+    {255, 255, 255, 255}, // white
+    {255, 0, 0, 255},     // red
+    {0, 255, 0, 255},     // green
+    {0, 0, 255, 255},     // blue
+    {255, 255, 0, 255},   // brown
+    {0, 255, 255, 255},   // cyan
+    {255, 0, 255, 255},   // purple
 };
+
+int getRandomNumberBetweenRange(int min, int max)
+{
+    return min + rand() / (RAND_MAX / (max - min + 1) + 1);
+}
 
 typedef struct
 {
     SDL_Rect bounds;
     bool isDestroyed;
     int points;
+    SDL_Color color;
 } Brick;
 
 vector<Brick> createBricks()
@@ -92,9 +98,16 @@ vector<Brick> createBricks()
     {
         positionX = 6;
 
+        int brickColorIndex = row;
+
+        if (row > 7)
+        {
+            brickColorIndex = getRandomNumberBetweenRange(0, 7);
+        }
+
         for (int column = 0; column < 12; column++)
         {
-            Brick actualBrick = {{positionX, positionY, 102, 20}, false, brickPoints};
+            Brick actualBrick = {{positionX, positionY, 102, 20}, false, brickPoints, colors[brickColorIndex]};
 
             bricks.push_back(actualBrick);
             positionX += 106;
@@ -202,11 +215,6 @@ void resetValues()
 
     player1Score = 0;
     updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
-}
-
-int getRandomNumberBetweenRange(int min, int max)
-{
-    return min + rand() / (RAND_MAX / (max - min + 1) + 1);
 }
 
 void update(float deltaTime)
@@ -543,7 +551,10 @@ void render()
         for (Brick brick : bricks)
         {
             if (!brick.isDestroyed)
+            {
+                SDL_SetRenderDrawColor(renderer, brick.color.r, brick.color.g, brick.color.b, brick.color.a);
                 SDL_RenderFillRect(renderer, &brick.bounds);
+            }
         }
     }
 
