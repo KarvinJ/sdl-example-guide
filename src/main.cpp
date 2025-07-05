@@ -538,7 +538,7 @@ void render()
         SDL_SetRenderDrawColor(renderer, colors[colorIndex].r, colors[colorIndex].g, colors[colorIndex].b, 255);
     }
 
-    if (gameStatus < -8)
+    if (gameStatus < -9)
     {
         for (Brick brick : bricks)
         {
