@@ -490,12 +490,14 @@ void render()
 {
     if (shouldClearScreen)
     {
-        SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-
         if (gameStatus == -8)
         {
             SDL_Color darkGreen = {20, 160, 133, 255};
             SDL_SetRenderDrawColor(renderer, darkGreen.r, darkGreen.g, darkGreen.b, darkGreen.a);
+        }
+        else
+        {
+            SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
         }
 
         SDL_RenderClear(renderer);
@@ -526,7 +528,7 @@ void render()
         SDL_RenderCopy(renderer, playerPositionTexture, NULL, &playerPositionBounds);
     }
 
-    if (gameStatus > 4)
+    if (gameStatus == 5)
     {
         renderSprite(renderer, playerSprite);
     }
