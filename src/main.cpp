@@ -43,6 +43,9 @@ SDL_Rect scoreBounds;
 SDL_Texture *scoreTexture2 = nullptr;
 SDL_Rect scoreBounds2;
 
+SDL_Texture *statusTexture = nullptr;
+SDL_Rect statusBounds;
+
 int player1Score = 0;
 int player2Score = 0;
 
@@ -146,11 +149,13 @@ void handleEvents()
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 5)
         {
             gameStatus++;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
         if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -10)
         {
             gameStatus--;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
         // All this functionalities are shared between controllers. In a future I may want to have specific button for just one control in specific.
@@ -173,11 +178,13 @@ void handleEvents()
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 5)
         {
             gameStatus++;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
         if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_LEFTSHOULDER && gameStatus > -10)
         {
             gameStatus--;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
     }
 }
@@ -579,6 +586,11 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
+    SDL_QueryTexture(statusTexture, NULL, NULL, &statusBounds.w, &statusBounds.h);
+    statusBounds.x = SCREEN_WIDTH - statusBounds.w - 10;
+    statusBounds.y = statusBounds.h;
+    SDL_RenderCopy(renderer, statusTexture, NULL, &statusBounds);
+
     if (isGamePaused)
     {
         SDL_RenderCopy(renderer, pauseTexture, NULL, &pauseBounds);
@@ -600,6 +612,7 @@ int main(int argc, char *args[])
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
     fontStart = TTF_OpenFont("res/fonts/PressStart2P.ttf", 20);
 
+    updateTextureText(statusTexture, "-1", fontStart, renderer);
     updateTextureText(controllerNameTexture, "No Connected", fontStart, renderer);
     updateTextureText(controller2NameTexture, "No Connected", fontStart, renderer);
 
