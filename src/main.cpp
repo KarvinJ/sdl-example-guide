@@ -3,8 +3,6 @@
 #include <string>
 #include <vector>
 
-using std::vector;
-
 SDL_Window *window = nullptr;
 SDL_Renderer *renderer = nullptr;
 SDL_GameController *controller = nullptr;
@@ -87,9 +85,9 @@ typedef struct
     SDL_Color color;
 } Brick;
 
-vector<Brick> createBricks()
+std::vector<Brick> createBricks()
 {
-    vector<Brick> bricks;
+    std::vector<Brick> bricks;
 
     // 9*12 Bricks
     bricks.reserve(108);
@@ -117,7 +115,7 @@ vector<Brick> createBricks()
     return bricks;
 }
 
-vector<Brick> bricks = createBricks();
+std::vector<Brick> bricks = createBricks();
 
 void handleEvents()
 {
@@ -191,25 +189,19 @@ void handleEvents()
 
 void resetValues()
 {
-    if (gameStatus == 1)
+    if (playerSprite.bounds.y < SCREEN_HEIGHT / 2)
     {
-        if (playerSprite.bounds.y < SCREEN_HEIGHT / 2)
-        {
-            playerSprite.bounds.x = 0;
-            playerSprite.bounds.y = 0;
-        }
-        else
-        {
-            playerSprite.bounds.x = 0;
-            playerSprite.bounds.y = SCREEN_HEIGHT - playerSprite.bounds.h;
-        }
+        playerSprite.bounds.x = 0;
+        playerSprite.bounds.y = 0;
+    }
+    else
+    {
+        playerSprite.bounds.x = 0;
+        playerSprite.bounds.y = SCREEN_HEIGHT - playerSprite.bounds.h;
     }
 
-    if (gameStatus > -3)
-    {
-        playerSprite.bounds.w = 38;
-        playerSprite.bounds.h = 34;
-    }
+    playerSprite.bounds.w = 38;
+    playerSprite.bounds.h = 34;
 
     ball.x = SCREEN_WIDTH / 2;
     ball.y = SCREEN_HEIGHT / 2;
@@ -536,8 +528,6 @@ void render()
 
     if (gameStatus < -6 && gameStatus > -9)
     {
-        displayConnectedControllersName();
-
         SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
         SDL_RenderDrawLine(renderer, SCREEN_WIDTH / 2, 0, SCREEN_WIDTH / 2, SCREEN_HEIGHT);
     }
