@@ -184,6 +184,23 @@ void handleEvents()
             gameStatus--;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
+
+        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERLEFT && gameStatus > -10)
+        {
+            gameStatus--;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
+        }
+
+        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 5)
+        {
+            gameStatus++;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
+        }
+
+        // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_LEFTX)
+        // {
+        //     playerSprite.bounds.x -= PLAYER_SPEED * 0.016;
+        // }
     }
 }
 
@@ -384,7 +401,7 @@ void update(float deltaTime)
 
         colorIndex = getRandomNumberBetweenRange(0, 5);
 
-        if (gameStatus < -3 || gameStatus > 2)
+        if (gameStatus != 2)
         {
             Mix_PlayChannel(-1, actionSound, 0);
         }
