@@ -60,14 +60,15 @@ int ballVelocityY = 400;
 int colorIndex = 0;
 
 SDL_Color colors[] = {
-    {128, 128, 128, 255}, // gray
-    {255, 255, 255, 255}, // white
+    {102, 102, 255, 255}, // morado
     {255, 0, 0, 255},     // red
     {0, 255, 0, 255},     // green
     {0, 0, 255, 255},     // blue
     {255, 255, 0, 255},   // brown
     {0, 255, 255, 255},   // cyan
     {255, 0, 255, 255},   // purple
+    {255, 0, 127, 255},   // pink
+    {255, 128, 0, 255},   // orange
 };
 
 int getRandomNumberBetweenRange(int min, int max)
@@ -87,27 +88,20 @@ vector<Brick> createBricks()
 {
     vector<Brick> bricks;
 
-    // 10*12 Bricks
-    bricks.reserve(120);
+    // 9*12 Bricks
+    bricks.reserve(108);
 
     int brickPoints = 10;
     int positionX = 0;
     int positionY = 80;
 
-    for (int row = 0; row < 10; row++)
+    for (int row = 0; row < 9; row++)
     {
         positionX = 6;
 
-        int brickColorIndex = row;
-
-        if (row > 7)
-        {
-            brickColorIndex = getRandomNumberBetweenRange(0, 7);
-        }
-
         for (int column = 0; column < 12; column++)
         {
-            Brick actualBrick = {{positionX, positionY, 102, 20}, false, brickPoints, colors[brickColorIndex]};
+            Brick actualBrick = {{positionX, positionY, 102, 20}, false, brickPoints, colors[row]};
 
             bricks.push_back(actualBrick);
             positionX += 106;
