@@ -633,7 +633,7 @@ int main(int argc, char *args[])
     pauseBounds.x = SCREEN_WIDTH / 2 - pauseBounds.w / 2;
     pauseBounds.y = SCREEN_HEIGHT / 2 - pauseBounds.h / 2;
 
-    playerSprite = loadSprite(renderer, "res/sprites/alien_1.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    playerSprite = loadSprite(renderer, "res/sprites/redbird-midflap.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     actionSound = loadSound("res/sounds/magic.wav");
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
