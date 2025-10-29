@@ -16,8 +16,12 @@ Mix_Chunk *actionSound = nullptr;
 
 Sprite playerSprite;
 
-SDL_Rect birdsBounds;
+SDL_Rect birdAnimationBounds;
 Sprite birdSprites;
+
+SDL_Rect reimuAnimationBounds;
+SDL_Rect reimuBounds;
+Sprite reimuSprites;
 
 const int PLAYER_SPEED = 600;
 
@@ -147,7 +151,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 6)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 7)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -176,7 +180,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 6)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 7)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -194,7 +198,7 @@ void handleEvents()
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
-        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 6)
+        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 7)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -537,7 +541,11 @@ void render()
     }
     else if (gameStatus == 6)
     {
-        SDL_RenderCopyEx(renderer, birdSprites.texture, &birdsBounds, &playerSprite.bounds, 0, NULL, SDL_FLIP_NONE);
+        SDL_RenderCopyEx(renderer, birdSprites.texture, &birdAnimationBounds, &playerSprite.bounds, 0, NULL, SDL_FLIP_NONE);
+    }
+    else if (gameStatus == 7)
+    {
+        SDL_RenderCopyEx(renderer, reimuSprites.texture, &reimuAnimationBounds, &reimuBounds, 0, NULL, SDL_FLIP_NONE);
     }
 
     if (gameStatus == -8)
@@ -616,7 +624,7 @@ void render()
 }
 
 // the rule of reference vs value also apply to primitive datatypes.
-void makeBirdAnimation(int &framesCounter, int &currentFrame, SDL_Rect &birdsBounds)
+void handleAnimationByBounds(int &framesCounter, int &currentFrame, SDL_Rect &currentAnimationBounds, int totalFrames)
 {
     int framesSpeed = 6;
 
@@ -627,10 +635,10 @@ void makeBirdAnimation(int &framesCounter, int &currentFrame, SDL_Rect &birdsBou
         framesCounter = 0;
         currentFrame++;
 
-        if (currentFrame > 2)
+        if (currentFrame >= totalFrames)
             currentFrame = 0;
 
-        birdsBounds.x = currentFrame * birdsBounds.w;
+        currentAnimationBounds.x = currentFrame * currentAnimationBounds.w;
     }
 }
 
@@ -662,7 +670,11 @@ int main(int argc, char *args[])
     playerSprite = loadSprite(renderer, "res/sprites/redbird-midflap.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     birdSprites = loadSprite(renderer, "res/sprites/red-bird-sprites.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    birdsBounds = {0, 0, birdSprites.bounds.w / 3, birdSprites.bounds.h};
+    birdAnimationBounds = {0, 0, birdSprites.bounds.w / 3, birdSprites.bounds.h};
+
+    reimuSprites = loadSprite(renderer, "res/sprites/reimu-spritesheet.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    reimuAnimationBounds = {0, 0, reimuSprites.bounds.w / 15, reimuSprites.bounds.h};
+    reimuBounds = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, reimuSprites.bounds.w / 15, reimuSprites.bounds.h};
 
     actionSound = loadSound("res/sounds/magic.wav");
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
@@ -708,7 +720,8 @@ int main(int argc, char *args[])
 
         if (!isGamePaused)
         {
-            makeBirdAnimation(framesCounter, currentFrame, birdsBounds);
+            handleAnimationByBounds(framesCounter, currentFrame, birdAnimationBounds, 3);
+            handleAnimationByBounds(framesCounter, currentFrame, reimuAnimationBounds, 15);
 
             update(deltaTime);
         }
