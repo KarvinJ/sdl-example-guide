@@ -16,6 +16,9 @@ Mix_Chunk *actionSound = nullptr;
 
 Sprite playerSprite;
 
+SDL_Rect birdsBounds;
+Sprite birdSprites;
+
 const int PLAYER_SPEED = 600;
 
 bool isGameRunning = true;
@@ -144,7 +147,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 5)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 6)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -173,7 +176,7 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 5)
+        if (event.type == SDL_CONTROLLERBUTTONDOWN && event.cbutton.button == SDL_CONTROLLER_BUTTON_RIGHTSHOULDER && gameStatus < 6)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -191,7 +194,7 @@ void handleEvents()
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
-        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 5)
+        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 6)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -505,7 +508,7 @@ void render()
 
     SDL_SetRenderDrawColor(renderer, 255, 255, 255, 255);
 
-    if (gameStatus != -1 && gameStatus != 5)
+    if (gameStatus != -1 && gameStatus < 5)
     {
         SDL_RenderFillRect(renderer, &playerSprite.bounds);
     }
@@ -531,6 +534,10 @@ void render()
     if (gameStatus == 5)
     {
         renderSprite(renderer, playerSprite);
+    }
+    else if (gameStatus == 6)
+    {
+        SDL_RenderCopyEx(renderer, birdSprites.texture, &birdsBounds, &playerSprite.bounds, 0, NULL, SDL_FLIP_NONE);
     }
 
     if (gameStatus == -8)
@@ -608,6 +615,25 @@ void render()
     SDL_RenderPresent(renderer);
 }
 
+// the rule of reference vs value also apply to primitive datatypes.
+void makeBirdAnimation(int &framesCounter, int &currentFrame, SDL_Rect &birdsBounds)
+{
+    int framesSpeed = 6;
+
+    framesCounter++;
+
+    if (framesCounter >= (60 / framesSpeed))
+    {
+        framesCounter = 0;
+        currentFrame++;
+
+        if (currentFrame > 2)
+            currentFrame = 0;
+
+        birdsBounds.x = currentFrame * birdsBounds.w;
+    }
+}
+
 int main(int argc, char *args[])
 {
     window = SDL_CreateWindow("My Window", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, SCREEN_WIDTH, SCREEN_HEIGHT, SDL_WINDOW_SHOWN);
@@ -635,12 +661,18 @@ int main(int argc, char *args[])
 
     playerSprite = loadSprite(renderer, "res/sprites/redbird-midflap.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
+    birdSprites = loadSprite(renderer, "res/sprites/red-bird-sprites.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+    birdsBounds = {0, 0, birdSprites.bounds.w / 3, birdSprites.bounds.h};
+
     actionSound = loadSound("res/sounds/magic.wav");
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
 
     // music = loadMusic("res/music/music.wav");
     // Mix_VolumeMusic(MIX_MAX_VOLUME / 4);
     // Mix_PlayMusic(music, -1);
+
+    int framesCounter = 0;
+    int currentFrame = 0;
 
     Uint32 previousFrameTime = SDL_GetTicks();
     Uint32 currentFrameTime = previousFrameTime;
@@ -676,6 +708,8 @@ int main(int argc, char *args[])
 
         if (!isGamePaused)
         {
+            makeBirdAnimation(framesCounter, currentFrame, birdsBounds);
+
             update(deltaTime);
         }
 
