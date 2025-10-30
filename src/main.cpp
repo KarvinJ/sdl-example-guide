@@ -545,6 +545,8 @@ void render()
     }
     else if (gameStatus == 7)
     {
+        reimuBounds.x = playerSprite.bounds.x - reimuBounds.w / 4;
+        reimuBounds.y = playerSprite.bounds.y - reimuBounds.h / 4;
         SDL_RenderCopyEx(renderer, reimuSprites.texture, &reimuAnimationBounds, &reimuBounds, 0, NULL, SDL_FLIP_NONE);
     }
 
@@ -624,13 +626,11 @@ void render()
 }
 
 // the rule of reference vs value also apply to primitive datatypes.
-void handleAnimationByBounds(int &framesCounter, int &currentFrame, SDL_Rect &currentAnimationBounds, int totalFrames)
+void handleAnimationByBounds(int &framesCounter, int &currentFrame, SDL_Rect &currentAnimationBounds, int totalFrames, int frameSpeed)
 {
-    int framesSpeed = 6;
-
     framesCounter++;
 
-    if (framesCounter >= (60 / framesSpeed))
+    if (framesCounter >= (60 / frameSpeed))
     {
         framesCounter = 0;
         currentFrame++;
@@ -670,11 +670,14 @@ int main(int argc, char *args[])
     playerSprite = loadSprite(renderer, "res/sprites/redbird-midflap.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 
     birdSprites = loadSprite(renderer, "res/sprites/red-bird-sprites.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    birdAnimationBounds = {0, 0, birdSprites.bounds.w / 3, birdSprites.bounds.h};
+    int birdSpritesTotalFrames = 3;
+
+    birdAnimationBounds = {0, 0, birdSprites.bounds.w / birdSpritesTotalFrames, birdSprites.bounds.h};
 
     reimuSprites = loadSprite(renderer, "res/sprites/reimu-spritesheet.png", SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-    reimuAnimationBounds = {0, 0, reimuSprites.bounds.w / 15, reimuSprites.bounds.h};
-    reimuBounds = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, reimuSprites.bounds.w / 15, reimuSprites.bounds.h};
+    int reimuSpritesTotalFrames = 14;
+    reimuAnimationBounds = {0, 0, reimuSprites.bounds.w / reimuSpritesTotalFrames, reimuSprites.bounds.h};
+    reimuBounds = {SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, reimuAnimationBounds.w, reimuAnimationBounds.h};
 
     actionSound = loadSound("res/sounds/magic.wav");
     Mix_VolumeChunk(actionSound, MIX_MAX_VOLUME / 10);
@@ -720,13 +723,21 @@ int main(int argc, char *args[])
 
         if (!isGamePaused)
         {
-            handleAnimationByBounds(framesCounter, currentFrame, birdAnimationBounds, 3);
-            handleAnimationByBounds(framesCounter, currentFrame, reimuAnimationBounds, 15);
+            if (gameStatus == 6)
+            {
+                handleAnimationByBounds(framesCounter, currentFrame, birdAnimationBounds, 3, 6);
+            }
+            else if (gameStatus == 7)
+            {
+                handleAnimationByBounds(framesCounter, currentFrame, reimuAnimationBounds, 14, 20);
+            }
 
             update(deltaTime);
         }
 
         render();
+
+        capFrameRate(currentFrameTime);
     }
 
     // Mix_FreeMusic(music);
