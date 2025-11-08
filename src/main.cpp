@@ -557,10 +557,10 @@ void render()
         SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
     }
 
-    if (gameStatus == -1)
-    {
-        displayConnectedControllersName();
-    }
+    // if (gameStatus == -1)
+    // {
+    //     displayConnectedControllersName();
+    // }
 
     if (gameStatus < -6 && gameStatus > -9)
     {
