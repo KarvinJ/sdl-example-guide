@@ -151,13 +151,13 @@ void handleEvents()
             Mix_PlayChannel(-1, actionSound, 0);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_PLUS && gameStatus < 7)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_o && gameStatus < 7)
         {
             gameStatus++;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
-        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_KP_MINUS && gameStatus > -10)
+        if (event.type == SDL_KEYDOWN && event.key.keysym.sym == SDLK_l && gameStatus > -10)
         {
             gameStatus--;
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
@@ -192,17 +192,17 @@ void handleEvents()
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
-        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERLEFT && gameStatus > -10)
-        {
-            gameStatus--;
-            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
-        }
+        // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERLEFT && gameStatus > -10)
+        // {
+        //     gameStatus--;
+        //     updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
+        // }
 
-        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 7)
-        {
-            gameStatus++;
-            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
-        }
+        // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 7)
+        // {
+        //     gameStatus++;
+        //     updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
+        // }
 
         // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_LEFTX)
         // {
