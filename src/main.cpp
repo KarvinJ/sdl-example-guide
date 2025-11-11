@@ -192,11 +192,11 @@ void handleEvents()
             updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
         }
 
-        // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERLEFT && gameStatus > -10)
-        // {
-        //     gameStatus--;
-        //     updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
-        // }
+        if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERLEFT)
+        {
+            gameStatus = -1;
+            updateTextureText(statusTexture, std::to_string(gameStatus).c_str(), fontStart, renderer);
+        }
 
         // if (event.type == SDL_CONTROLLERAXISMOTION && event.cbutton.button == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && gameStatus < 7)
         // {
@@ -566,10 +566,10 @@ void render()
         SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
     }
 
-    if (gameStatus == -1)
-    {
-        displayConnectedControllersName();
-    }
+    // if (gameStatus == -1)
+    // {
+    //     displayConnectedControllersName();
+    // }
 
     if (gameStatus < -6 && gameStatus > -9)
     {
