@@ -54,7 +54,7 @@ SDL_Rect statusBounds;
 int player1Score = 0;
 int player2Score = 0;
 
-int gameStatus = -1;
+int gameStatus = 0;
 
 TTF_Font *fontSquare = nullptr;
 TTF_Font *fontStart = nullptr;
@@ -420,6 +420,15 @@ void update(float deltaTime)
         }
     }
 
+    if (gameStatus == -9 || gameStatus == -1)
+    {
+        ball.x = SCREEN_WIDTH / 2;
+        ball.y = SCREEN_HEIGHT / 2;
+
+        player1Score = 0;
+        updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
+    }
+
     if (gameStatus < -9)
     {
         for (auto actualBrick = bricks.begin(); actualBrick != bricks.end();)
@@ -557,10 +566,10 @@ void render()
         SDL_RenderFillCircle(renderer, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 150);
     }
 
-    // if (gameStatus == -1)
-    // {
-    //     displayConnectedControllersName();
-    // }
+    if (gameStatus == -1)
+    {
+        displayConnectedControllersName();
+    }
 
     if (gameStatus < -6 && gameStatus > -9)
     {
@@ -612,10 +621,10 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
-    // SDL_QueryTexture(statusTexture, NULL, NULL, &statusBounds.w, &statusBounds.h);
-    // statusBounds.x = SCREEN_WIDTH - statusBounds.w - 10;
-    // statusBounds.y = statusBounds.h;
-    // SDL_RenderCopy(renderer, statusTexture, NULL, &statusBounds);
+    SDL_QueryTexture(statusTexture, NULL, NULL, &statusBounds.w, &statusBounds.h);
+    statusBounds.x = SCREEN_WIDTH - statusBounds.w - 10;
+    statusBounds.y = statusBounds.h;
+    SDL_RenderCopy(renderer, statusTexture, NULL, &statusBounds);
 
     if (isGamePaused)
     {
@@ -655,7 +664,7 @@ int main(int argc, char *args[])
     fontSquare = TTF_OpenFont("res/fonts/square_sans_serif_7.ttf", 90);
     fontStart = TTF_OpenFont("res/fonts/PressStart2P.ttf", 20);
 
-    updateTextureText(statusTexture, "-1", fontStart, renderer);
+    updateTextureText(statusTexture, "0", fontStart, renderer);
     updateTextureText(controllerNameTexture, "No Connected", fontStart, renderer);
     updateTextureText(controller2NameTexture, "No Connected", fontStart, renderer);
 
