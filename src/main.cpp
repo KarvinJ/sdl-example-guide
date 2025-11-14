@@ -424,6 +424,8 @@ void update(float deltaTime)
     {
         ball.x = SCREEN_WIDTH / 2;
         ball.y = SCREEN_HEIGHT / 2;
+        ballVelocityX = -400;
+        ballVelocityY = 400;
 
         player1Score = 0;
         updateTextureText(scoreTexture, std::to_string(player1Score).c_str(), fontSquare, renderer);
@@ -621,10 +623,10 @@ void render()
         SDL_RenderCopy(renderer, scoreTexture2, NULL, &scoreBounds2);
     }
 
-    SDL_QueryTexture(statusTexture, NULL, NULL, &statusBounds.w, &statusBounds.h);
-    statusBounds.x = SCREEN_WIDTH - statusBounds.w - 10;
-    statusBounds.y = statusBounds.h;
-    SDL_RenderCopy(renderer, statusTexture, NULL, &statusBounds);
+    // SDL_QueryTexture(statusTexture, NULL, NULL, &statusBounds.w, &statusBounds.h);
+    // statusBounds.x = SCREEN_WIDTH - statusBounds.w - 10;
+    // statusBounds.y = statusBounds.h;
+    // SDL_RenderCopy(renderer, statusTexture, NULL, &statusBounds);
 
     if (isGamePaused)
     {
