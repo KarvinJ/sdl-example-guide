@@ -459,8 +459,8 @@ void update(float deltaTime)
 
     if ((gameStatus != -9 && gameStatus < -4) || gameStatus > 1)
     {
-        ball.x += ballVelocityX * deltaTime;
-        ball.y += ballVelocityY * deltaTime;
+        ball.x += (int)(ballVelocityX * deltaTime);
+        ball.y += (int)(ballVelocityY * deltaTime);
     }
 }
 
